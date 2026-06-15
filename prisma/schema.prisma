@@ -1,0 +1,200 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+enum Role {
+  PARENT
+  TEACHER
+  ADMIN
+  SUPER_ADMIN
+}
+
+enum Gender {
+  MALE
+  FEMALE
+}
+
+enum AttendanceStatus {
+  PRESENT
+  ABSENT
+  LATE
+}
+
+enum AnnouncementType {
+  MEETING
+  OUTING
+  EVENT
+  INFO
+}
+
+model User {
+  id          String   @id @default(cuid())
+  firstName   String
+  lastName    String
+  email       String   @unique
+  password    String
+  role        Role     @default(PARENT)
+  phone       String?
+  avatar      String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  kindergartenId String?
+  kindergarten   Kindergarten? @relation(fields: [kindergartenId], references: [id])
+
+  taughtClasses  Classroom[]    @relation("TeacherClassrooms")
+  parentChildren ParentChild[]
+  notifications  Notification[]
+  activities     Activity[]     @relation("ActivityCreator")
+  announcements  Announcement[] @relation("AnnouncementCreator")
+}
+
+model Kindergarten {
+  id              String   @id @default(cuid())
+  name            String
+  address         String?
+  phone           String?
+  whatsappNumber  String?
+  email           String?
+  logo            String?
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  users           User[]
+  classrooms      Classroom[]
+  announcements   Announcement[]
+  meals           Meal[]
+}
+
+model Classroom {
+  id             String   @id @default(cuid())
+  name           String
+  description    String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  kindergartenId String
+  kindergarten   Kindergarten @relation(fields: [kindergartenId], references: [id])
+
+  teacherId      String?
+  teacher        User?    @relation("TeacherClassrooms", fields: [teacherId], references: [id])
+
+  children       Child[]
+  activities     Activity[]
+}
+
+model Child {
+  id            String   @id @default(cuid())
+  firstName     String
+  lastName      String
+  birthDate     DateTime
+  gender        Gender
+  photo         String?
+  allergies     String?
+  medicalNotes  String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  classroomId   String?
+  classroom     Classroom? @relation(fields: [classroomId], references: [id])
+
+  parents       ParentChild[]
+  attendances   Attendance[]
+}
+
+model ParentChild {
+  id        String @id @default(cuid())
+  parentId  String
+  childId   String
+
+  parent    User  @relation(fields: [parentId], references: [id], onDelete: Cascade)
+  child     Child @relation(fields: [childId], references: [id], onDelete: Cascade)
+
+  @@unique([parentId, childId])
+}
+
+model Activity {
+  id           String   @id @default(cuid())
+  title        String
+  description  String?
+  activityDate DateTime
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  classroomId  String
+  classroom    Classroom @relation(fields: [classroomId], references: [id])
+
+  createdById  String
+  createdBy    User      @relation("ActivityCreator", fields: [createdById], references: [id])
+
+  media        Media[]
+}
+
+model Media {
+  id         String   @id @default(cuid())
+  filename   String
+  filepath   String
+  filetype   String
+  createdAt  DateTime @default(now())
+
+  activityId String?
+  activity   Activity? @relation(fields: [activityId], references: [id], onDelete: Cascade)
+}
+
+model Attendance {
+  id      String           @id @default(cuid())
+  date    DateTime
+  status  AttendanceStatus @default(PRESENT)
+
+  childId String
+  child   Child  @relation(fields: [childId], references: [id], onDelete: Cascade)
+
+  @@unique([childId, date])
+}
+
+model Meal {
+  id        String   @id @default(cuid())
+  breakfast String?
+  lunch     String?
+  snack     String?
+  date      DateTime
+  createdAt DateTime @default(now())
+
+  kindergartenId String
+  kindergarten   Kindergarten @relation(fields: [kindergartenId], references: [id])
+
+  @@unique([kindergartenId, date])
+}
+
+model Announcement {
+  id        String           @id @default(cuid())
+  title     String
+  content   String
+  type      AnnouncementType @default(INFO)
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+
+  kindergartenId String
+  kindergarten   Kindergarten @relation(fields: [kindergartenId], references: [id])
+
+  createdById String
+  createdBy   User   @relation("AnnouncementCreator", fields: [createdById], references: [id])
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  title     String
+  content   String
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  userId    String
+  user      User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+}

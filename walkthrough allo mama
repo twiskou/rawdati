@@ -1,0 +1,123 @@
+# ALLO MAMA — Récapitulatif complet 🍼
+
+## Vue d'ensemble
+
+Application fullstack Next.js 15 de communication crèche ↔ parents en Algérie.  
+Authentification JWT, base SQLite (Prisma), 4 espaces utilisateurs avec sidebar responsive.
+
+---
+
+## ✅ Fichiers créés
+
+### 🔐 Login
+| Fichier | Description |
+|---|---|
+| [login/page.tsx](file:///c:/Users/annab/OneDrive/Desktop/rawdati/src/app/login/page.tsx) | Page de connexion premium (design Clerk/Linear) |
+
+### 👨‍👩‍👧 Espace Parent
+
+| Fichier | Description |
+|---|---|
+| [ParentSidebar.tsx](file:///c:/Users/annab/OneDrive/Desktop/rawdati/src/components/sidebar/ParentSidebar.tsx) | Sidebar avec drawer mobile |
+| [parent/layout.tsx](file:///c:/Users/annab/OneDrive/Desktop/rawdati/src/app/parent/layout.tsx) | Layout protégé (session PARENT) |
+| [parent/dashboard/page.tsx](file:///c:/Users/annab/OneDrive/Desktop/rawdati/src/app/parent/dashboard/page.tsx) | Dashboard — stats, activités, repas, annonces |
+| [parent/child/page.tsx](file:///c:/Users/annab/OneDrive/Desktop/rawdati/src/app/parent/child/page.tsx) | Fiche enfant avec infos médicales |
+| [parent/activities/page.tsx](file:///c:/Users/annab/OneDrive/Desktop/rawdati/src/app/parent/activities/page.tsx) | Grille d'activités |
+| [parent/gallery/page.tsx](file:///c:/Users/annab/OneDrive/Desktop/rawdati/src/app/parent/gallery/page.tsx) | Galerie photos avec lightbox |
+| [parent/attendance/page.tsx](file:///c:/Users/annab/OneDrive/Desktop/rawdati/src/app/parent/attendance/page.tsx) | Calendrier de présences codé couleur |
+| [parent/meals/page.tsx](file:///c:/Users/annab/OneDrive/Desktop/rawdati/src/app/parent/meals/page.tsx) | Vue semaine des repas avec navigation |
+| [parent/announcements/page.tsx](file:///c:/Users/annab/OneDrive/Desktop/rawdati/src/app/parent/announcements/page.tsx) | Liste d'annonces avec badges de type |
+| [parent/profile/page.tsx](file:///c:/Users/annab/OneDrive/Desktop/rawdati/src/app/parent/profile/page.tsx) | Profil utilisateur avec changement de MDP |
+
+### 👩‍🏫 Espace Éducatrice
+
+| Fichier | Description |
+|---|---|
+| [TeacherSidebar.tsx](file:///c:/Users/annab/OneDrive/Desktop/rawdati/src/components/sidebar/TeacherSidebar.tsx) | Sidebar éducatrice |
+| [teacher/layout.tsx](file:///c:/Users/annab/OneDrive/Desktop/rawdati/src/app/teacher/layout.tsx) | Layout protégé (session TEACHER) |
+| [teacher/dashboard/page.tsx](file:///c:/Users/annab/OneDrive/Desktop/rawdati/src/app/teacher/dashboard/page.tsx) | Dashboard avec liste élèves + présences du jour |
+| [teacher/activities/page.tsx](file:///c:/Users/annab/OneDrive/Desktop/rawdati/src/app/teacher/activities/page.tsx) | Gestion activités avec modale création |
+| [teacher/attendance/page.tsx](file:///c:/Users/annab/OneDrive/Desktop/rawdati/src/app/teacher/attendance/page.tsx) | Marquage présences en temps réel (API) |
+| [teacher/meals/page.tsx](file:///c:/Users/annab/OneDrive/Desktop/rawdati/src/app/teacher/meals/page.tsx) | Publication du menu du jour |
+| [teacher/gallery/page.tsx](file:///c:/Users/annab/OneDrive/Desktop/rawdati/src/app/teacher/gallery/page.tsx) | Galerie avec gestion des photos |
+| [teacher/announcements/page.tsx](file:///c:/Users/annab/OneDrive/Desktop/rawdati/src/app/teacher/announcements/page.tsx) | Création/suppression d'annonces |
+
+### 🏫 Espace Admin
+
+| Fichier | Description |
+|---|---|
+| [AdminSidebar.tsx](file:///c:/Users/annab/OneDrive/Desktop/rawdati/src/components/sidebar/AdminSidebar.tsx) | Sidebar admin avec nom crèche |
+| [admin/layout.tsx](file:///c:/Users/annab/OneDrive/Desktop/rawdati/src/app/admin/layout.tsx) | Layout protégé (session ADMIN) |
+| [admin/dashboard/page.tsx](file:///c:/Users/annab/OneDrive/Desktop/rawdati/src/app/admin/dashboard/page.tsx) | Vue globale crèche : stats + classes + activités |
+| [admin/users/page.tsx](file:///c:/Users/annab/OneDrive/Desktop/rawdati/src/app/admin/users/page.tsx) | Gestion utilisateurs avec filtres + tableau |
+| [admin/children/page.tsx](file:///c:/Users/annab/OneDrive/Desktop/rawdati/src/app/admin/children/page.tsx) | Grille enfants avec infos médicales |
+| [admin/classrooms/page.tsx](file:///c:/Users/annab/OneDrive/Desktop/rawdati/src/app/admin/classrooms/page.tsx) | Cards des classes avec stats |
+| [admin/activities/page.tsx](file:///c:/Users/annab/OneDrive/Desktop/rawdati/src/app/admin/activities/page.tsx) | Toutes les activités avec filtre par classe |
+| [admin/announcements/page.tsx](file:///c:/Users/annab/OneDrive/Desktop/rawdati/src/app/admin/announcements/page.tsx) | Création + tableau annonces |
+| [admin/settings/page.tsx](file:///c:/Users/annab/OneDrive/Desktop/rawdati/src/app/admin/settings/page.tsx) | Configuration crèche + logo + zone danger |
+
+### 🛡️ Espace Super Admin
+
+| Fichier | Description |
+|---|---|
+| [SuperAdminSidebar.tsx](file:///c:/Users/annab/OneDrive/Desktop/rawdati/src/components/sidebar/SuperAdminSidebar.tsx) | Sidebar avec badge "SUPER ADMIN" |
+| [super-admin/layout.tsx](file:///c:/Users/annab/OneDrive/Desktop/rawdati/src/app/super-admin/layout.tsx) | Layout protégé (session SUPER_ADMIN) |
+| [super-admin/dashboard/page.tsx](file:///c:/Users/annab/OneDrive/Desktop/rawdati/src/app/super-admin/dashboard/page.tsx) | Dashboard global + bar chart + tableau crèches |
+| [super-admin/kindergartens/page.tsx](file:///c:/Users/annab/OneDrive/Desktop/rawdati/src/app/super-admin/kindergartens/page.tsx) | Toutes les crèches + création + activation |
+| [super-admin/users/page.tsx](file:///c:/Users/annab/OneDrive/Desktop/rawdati/src/app/super-admin/users/page.tsx) | Tous les utilisateurs plateforme + filtres avancés |
+| [super-admin/subscriptions/page.tsx](file:///c:/Users/annab/OneDrive/Desktop/rawdati/src/app/super-admin/subscriptions/page.tsx) | Abonnements avec statut + progression |
+
+### 🔌 API Routes
+
+| Route | Méthode | Description |
+|---|---|---|
+| `/api/teacher/activities` | POST | Créer une activité |
+| `/api/teacher/attendance` | POST | Marquer présence (upsert) |
+| `/api/teacher/meals` | POST | Publier repas (upsert) |
+| `/api/teacher/announcements` | POST/DELETE | Gérer annonces |
+| `/api/admin/announcements` | POST/DELETE | Annonces admin |
+| `/api/admin/settings` | PUT | Mettre à jour crèche |
+| `/api/super-admin/kindergartens` | GET/POST/PATCH | CRUD crèches |
+
+---
+
+## 🎨 Design System
+
+| Élément | Valeur |
+|---|---|
+| Couleur primaire | `#F72585` (rose) |
+| Couleur secondaire | `#4361EE` (bleu) |
+| Gradient | `linear-gradient(135deg, #F72585, #4361EE)` |
+| Border radius cards | `16px–24px` |
+| Box shadow | `0 2px 12px rgba(0,0,0,0.06)` |
+| Font | Inter (Google Fonts, déjà configuré) |
+| Responsive | Style inline (`style={{}}`) — pas de classes Tailwind responsive |
+
+---
+
+## 🔑 Comptes de test
+
+| Email | Mot de passe | Rôle | Dashboard |
+|---|---|---|---|
+| `superadmin@allomama.com` | `Admin@123` | SUPER_ADMIN | `/super-admin/dashboard` |
+| `teacher@allomama.com` | `Teacher@123` | TEACHER | `/teacher/dashboard` |
+| `parent@allomama.com` | `Parent@123` | PARENT | `/parent/dashboard` |
+
+> [!IMPORTANT]
+> Le compte `ADMIN` n'est pas dans les seeds. Il faut en créer un manuellement ou via le super admin.
+
+---
+
+## 🚀 Lancer l'application
+
+```bash
+npm run dev
+```
+
+Puis ouvrir [http://localhost:3000/login](http://localhost:3000/login)
+
+---
+
+## ⚠️ Erreur préexistante ignorée
+
+L'erreur `prisma.config.ts:8 — 'migrate' does not exist in type 'PrismaConfig'` est **préexistante** et non liée au code créé. Elle n'empêche pas le fonctionnement de l'application.
