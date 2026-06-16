@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation'
 import { getSession } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
-import { getT } from '@/lib/i18n/server'
+import { getServerLanguage } from '@/lib/i18n/server'
 
 const badgeColors: Record<string, { bg: string; color: string }> = {
   MEETING: { bg: '#ede9fe', color: '#7c3aed' },
@@ -21,7 +21,7 @@ export default async function ParentAnnouncementsPage() {
   const session = await getSession()
   if (!session || session.role !== 'PARENT') redirect('/login')
 
-  const t = await getT()
+  const { t } = await getServerLanguage()
 
   const parentChildren = await prisma.parentChild.findMany({
     where: { parentId: session.id },

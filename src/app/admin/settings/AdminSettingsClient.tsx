@@ -2,6 +2,7 @@
 
 import { useState, useTransition, useRef } from 'react'
 import { Save, Building2, Phone, Mail, MapPin, MessageCircle, Upload, Lock, Key, CheckCircle, AlertTriangle } from 'lucide-react'
+import { useLanguage } from '@/lib/i18n/LanguageContext'
 
 interface KindergartenData {
   id: string
@@ -18,6 +19,9 @@ interface AdminSettingsClientProps {
 }
 
 export default function AdminSettingsClient({ kindergarten }: AdminSettingsClientProps) {
+  const { t, isRTL } = useLanguage()
+  const tr = t.admin.settings
+
   // General Info State
   const [name, setName] = useState(kindergarten.name)
   const [address, setAddress] = useState(kindergarten.address ?? '')
@@ -38,10 +42,11 @@ export default function AdminSettingsClient({ kindergarten }: AdminSettingsClien
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const inputStyle: React.CSSProperties = {
-    width: '100%', padding: '13px 14px 13px 44px',
+    width: '100%', padding: isRTL ? '13px 44px 13px 14px' : '13px 14px 13px 44px',
     border: '1.5px solid #e2e8f0', borderRadius: '12px',
     fontSize: '14px', color: '#1e293b', background: '#f8fafc',
     outline: 'none', boxSizing: 'border-box', fontFamily: 'inherit',
+    textAlign: isRTL ? 'right' : 'left',
   }
 
   function handleLogoChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -50,7 +55,7 @@ export default function AdminSettingsClient({ kindergarten }: AdminSettingsClien
 
     // Check size (2MB)
     if (file.size > 2 * 1024 * 1024) {
-      setMsg({ ok: false, text: 'Le logo ne doit pas dépasser 2 MB' })
+      setMsg({ ok: false, text: tr.logoError })
       setTimeout(() => setMsg(null), 3000)
       return
     }
@@ -73,9 +78,9 @@ export default function AdminSettingsClient({ kindergarten }: AdminSettingsClien
         body: JSON.stringify({ id: kindergarten.id, name, address, phone, whatsappNumber: whatsapp, email, logo }),
       })
       if (res.ok) {
-        setMsg({ ok: true, text: 'Paramètres mis à jour avec succès !' })
+        setMsg({ ok: true, text: tr.successInfo })
       } else {
-        setMsg({ ok: false, text: 'Erreur lors de la mise à jour' })
+        setMsg({ ok: false, text: tr.errorInfo })
       }
       setTimeout(() => setMsg(null), 3000)
     })
@@ -85,13 +90,13 @@ export default function AdminSettingsClient({ kindergarten }: AdminSettingsClien
     e.preventDefault()
     
     if (newPassword !== confirmPassword) {
-      setPwdMsg({ ok: false, text: 'Les nouveaux mots de passe ne correspondent pas' })
+      setPwdMsg({ ok: false, text: tr.pwdMismatch })
       setTimeout(() => setPwdMsg(null), 3000)
       return
     }
 
     if (newPassword.length < 6) {
-      setPwdMsg({ ok: false, text: 'Le nouveau mot de passe doit contenir au moins 6 caractères' })
+      setPwdMsg({ ok: false, text: tr.pwdShort })
       setTimeout(() => setPwdMsg(null), 3000)
       return
     }
@@ -104,12 +109,12 @@ export default function AdminSettingsClient({ kindergarten }: AdminSettingsClien
       })
       
       if (res.ok) {
-        setPwdMsg({ ok: true, text: 'Mot de passe modifié avec succès !' })
+        setPwdMsg({ ok: true, text: tr.successPwd })
         setCurrentPassword('')
         setNewPassword('')
         setConfirmPassword('')
       } else {
-        let errText = 'Erreur lors du changement de mot de passe'
+        let errText = tr.errorPwd
         try {
           const err = await res.json()
           if (err && err.error) errText = err.error
@@ -123,18 +128,18 @@ export default function AdminSettingsClient({ kindergarten }: AdminSettingsClien
   }
 
   const fields = [
-    { label: 'Nom de la crèche', icon: <Building2 size={16} color="#94a3b8" />, value: name, setter: setName, type: 'text', placeholder: 'Ex: Crèche Les Petits Anges' },
-    { label: 'Adresse', icon: <MapPin size={16} color="#94a3b8" />, value: address, setter: setAddress, type: 'text', placeholder: 'Ex: 12 Rue des Fleurs, Alger' },
-    { label: 'Téléphone', icon: <Phone size={16} color="#94a3b8" />, value: phone, setter: setPhone, type: 'tel', placeholder: '+213 XXX XXX XXX' },
-    { label: 'Email', icon: <Mail size={16} color="#94a3b8" />, value: email, setter: setEmail, type: 'email', placeholder: 'contact@creche.dz' },
-    { label: 'Numéro WhatsApp', icon: <MessageCircle size={16} color="#94a3b8" />, value: whatsapp, setter: setWhatsapp, type: 'tel', placeholder: '+213 XXX XXX XXX' },
+    { label: tr.name, icon: <Building2 size={16} color="#94a3b8" />, value: name, setter: setName, type: 'text', placeholder: tr.namePlh },
+    { label: tr.address, icon: <MapPin size={16} color="#94a3b8" />, value: address, setter: setAddress, type: 'text', placeholder: tr.addressPlh },
+    { label: tr.phone, icon: <Phone size={16} color="#94a3b8" />, value: phone, setter: setPhone, type: 'tel', placeholder: tr.phonePlh },
+    { label: tr.email, icon: <Mail size={16} color="#94a3b8" />, value: email, setter: setEmail, type: 'email', placeholder: tr.emailPlh },
+    { label: tr.whatsapp, icon: <MessageCircle size={16} color="#94a3b8" />, value: whatsapp, setter: setWhatsapp, type: 'tel', placeholder: tr.whatsappPlh },
   ]
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', maxWidth: '720px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', maxWidth: '720px', direction: isRTL ? 'rtl' : 'ltr' }}>
       {/* Logo card */}
       <div style={{ background: 'white', borderRadius: '20px', padding: '28px', boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
-        <h2 style={{ margin: '0 0 20px', fontSize: '17px', fontWeight: '700', color: '#0f172a' }}>Logo de la crèche</h2>
+        <h2 style={{ margin: '0 0 20px', fontSize: '17px', fontWeight: '700', color: '#0f172a' }}>{tr.logoTitle}</h2>
         <div style={{ display: 'flex', alignItems: 'center', gap: '24px', flexWrap: 'wrap' }}>
           <div
             style={{
@@ -152,9 +157,8 @@ export default function AdminSettingsClient({ kindergarten }: AdminSettingsClien
             )}
           </div>
           <div>
-            <p style={{ margin: '0 0 12px', fontSize: '14px', color: '#64748b', lineHeight: '1.5' }}>
-              Téléchargez le logo de votre crèche.<br />
-              Formats acceptés : PNG, JPG, SVG — Max 2 MB
+            <p style={{ margin: '0 0 12px', fontSize: '14px', color: '#64748b', lineHeight: '1.5', whiteSpace: 'pre-line' }}>
+              {tr.logoDesc}
             </p>
             <input 
               type="file" 
@@ -175,7 +179,7 @@ export default function AdminSettingsClient({ kindergarten }: AdminSettingsClien
               }}
             >
               <Upload size={15} />
-              Choisir un logo
+              {tr.chooseLogo}
             </button>
           </div>
         </div>
@@ -184,7 +188,7 @@ export default function AdminSettingsClient({ kindergarten }: AdminSettingsClien
       {/* Info form */}
       <div style={{ background: 'white', borderRadius: '20px', padding: '28px', boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
         <h2 style={{ margin: '0 0 24px', fontSize: '17px', fontWeight: '700', color: '#0f172a' }}>
-          Informations de la crèche
+          {tr.infoTitle}
         </h2>
 
         {msg && (
@@ -201,7 +205,7 @@ export default function AdminSettingsClient({ kindergarten }: AdminSettingsClien
                 {f.label}
               </label>
               <div style={{ position: 'relative' }}>
-                <div style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', display: 'flex', alignItems: 'center' }}>
+                <div style={{ position: 'absolute', [isRTL ? 'right' : 'left']: '14px', top: '50%', transform: 'translateY(-50%)', display: 'flex', alignItems: 'center' }}>
                   {f.icon}
                 </div>
                 <input
@@ -222,9 +226,9 @@ export default function AdminSettingsClient({ kindergarten }: AdminSettingsClien
                   }}
                 />
               </div>
-              {f.label === 'Numéro WhatsApp' && (
+              {f.label === tr.whatsapp && (
                 <p style={{ margin: '6px 0 0', fontSize: '12px', color: '#94a3b8' }}>
-                  Ce numéro sera utilisé pour le bouton WhatsApp visible des parents.
+                  {tr.whatsappHint}
                 </p>
               )}
             </div>
@@ -245,7 +249,7 @@ export default function AdminSettingsClient({ kindergarten }: AdminSettingsClien
               }}
             >
               <Save size={18} />
-              {isPending ? 'Enregistrement...' : 'Sauvegarder'}
+              {isPending ? tr.savingInfo : tr.saveInfo}
             </button>
           </div>
         </form>
@@ -255,7 +259,7 @@ export default function AdminSettingsClient({ kindergarten }: AdminSettingsClien
       <div style={{ background: 'white', borderRadius: '20px', padding: '28px', boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
         <h2 style={{ margin: '0 0 24px', fontSize: '17px', fontWeight: '700', color: '#0f172a', display: 'flex', alignItems: 'center', gap: '8px' }}>
           <Lock size={18} color="#0f172a" />
-          Changer le mot de passe
+          {tr.pwdTitle}
         </h2>
 
         {pwdMsg && (
@@ -268,10 +272,10 @@ export default function AdminSettingsClient({ kindergarten }: AdminSettingsClien
         <form onSubmit={handlePasswordSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
           <div>
             <label style={{ display: 'block', fontSize: '12px', fontWeight: '700', color: '#374151', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
-              Ancien mot de passe
+              {tr.oldPwd}
             </label>
             <div style={{ position: 'relative' }}>
-              <div style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', display: 'flex', alignItems: 'center' }}>
+              <div style={{ position: 'absolute', [isRTL ? 'right' : 'left']: '14px', top: '50%', transform: 'translateY(-50%)', display: 'flex', alignItems: 'center' }}>
                 <Key size={16} color="#94a3b8" />
               </div>
               <input
@@ -279,7 +283,7 @@ export default function AdminSettingsClient({ kindergarten }: AdminSettingsClien
                 required
                 value={currentPassword}
                 onChange={(e) => setCurrentPassword(e.target.value)}
-                placeholder="••••••••"
+                placeholder={tr.pwdPlh}
                 style={inputStyle}
                 onFocus={(e) => {
                   e.target.style.borderColor = '#4361EE'
@@ -297,10 +301,10 @@ export default function AdminSettingsClient({ kindergarten }: AdminSettingsClien
 
           <div>
             <label style={{ display: 'block', fontSize: '12px', fontWeight: '700', color: '#374151', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
-              Nouveau mot de passe
+              {tr.newPwd}
             </label>
             <div style={{ position: 'relative' }}>
-              <div style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', display: 'flex', alignItems: 'center' }}>
+              <div style={{ position: 'absolute', [isRTL ? 'right' : 'left']: '14px', top: '50%', transform: 'translateY(-50%)', display: 'flex', alignItems: 'center' }}>
                 <Lock size={16} color="#94a3b8" />
               </div>
               <input
@@ -309,7 +313,7 @@ export default function AdminSettingsClient({ kindergarten }: AdminSettingsClien
                 minLength={6}
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
-                placeholder="••••••••"
+                placeholder={tr.pwdPlh}
                 style={inputStyle}
                 onFocus={(e) => {
                   e.target.style.borderColor = '#4361EE'
@@ -327,10 +331,10 @@ export default function AdminSettingsClient({ kindergarten }: AdminSettingsClien
 
           <div>
             <label style={{ display: 'block', fontSize: '12px', fontWeight: '700', color: '#374151', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
-              Confirmer le nouveau mot de passe
+              {tr.confirmPwd}
             </label>
             <div style={{ position: 'relative' }}>
-              <div style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', display: 'flex', alignItems: 'center' }}>
+              <div style={{ position: 'absolute', [isRTL ? 'right' : 'left']: '14px', top: '50%', transform: 'translateY(-50%)', display: 'flex', alignItems: 'center' }}>
                 <Lock size={16} color="#94a3b8" />
               </div>
               <input
@@ -339,7 +343,7 @@ export default function AdminSettingsClient({ kindergarten }: AdminSettingsClien
                 minLength={6}
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                placeholder="••••••••"
+                placeholder={tr.pwdPlh}
                 style={inputStyle}
                 onFocus={(e) => {
                   e.target.style.borderColor = '#4361EE'
@@ -370,7 +374,7 @@ export default function AdminSettingsClient({ kindergarten }: AdminSettingsClien
               }}
             >
               <Save size={18} />
-              {isPwdPending ? 'Mise à jour...' : 'Mettre à jour le mot de passe'}
+              {isPwdPending ? tr.updatingPwd : tr.updatePwd}
             </button>
           </div>
         </form>

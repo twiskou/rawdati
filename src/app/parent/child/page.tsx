@@ -2,7 +2,7 @@ import { redirect } from 'next/navigation'
 import { getSession } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { Baby, Heart, BookOpen, AlertTriangle } from 'lucide-react'
-import { getT } from '@/lib/i18n/server'
+import { getServerLanguage } from '@/lib/i18n/server'
 
 function calculateAge(birthDate: Date): string {
   const now = new Date()
@@ -19,7 +19,7 @@ export default async function ParentChildPage() {
   const session = await getSession()
   if (!session || session.role !== 'PARENT') redirect('/login')
 
-  const t = await getT()
+  const { t } = await getServerLanguage()
 
   const parentChildren = await prisma.parentChild.findMany({
     where: { parentId: session.id },

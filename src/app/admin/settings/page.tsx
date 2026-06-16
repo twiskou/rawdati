@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation'
 import { getSession } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import AdminSettingsClient from './AdminSettingsClient'
+import { getServerLanguage } from '@/lib/i18n/server'
 
 export default async function AdminSettingsPage() {
   const session = await getSession()
@@ -14,14 +15,17 @@ export default async function AdminSettingsPage() {
 
   if (!kindergarten) redirect('/admin/dashboard')
 
+  const { t, isRTL } = await getServerLanguage()
+  const tr = t.admin.settings
+
   return (
-    <div style={{ fontFamily: "'Inter', 'Segoe UI', sans-serif" }}>
+    <div style={{ fontFamily: "'Inter', 'Segoe UI', sans-serif", direction: isRTL ? 'rtl' : 'ltr' }}>
       <div style={{ marginBottom: '28px' }}>
         <h1 style={{ fontSize: '28px', fontWeight: '800', color: '#0f172a', margin: '0 0 6px', letterSpacing: '-0.5px' }}>
-          Paramètres
+          {tr.title}
         </h1>
         <p style={{ fontSize: '15px', color: '#64748b', margin: 0 }}>
-          Configuration de votre crèche
+          {tr.subtitle}
         </p>
       </div>
       <AdminSettingsClient

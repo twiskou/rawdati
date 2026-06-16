@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation'
 import { getSession } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
-import { getT } from '@/lib/i18n/server'
+import { getServerLanguage } from '@/lib/i18n/server'
 import { Search, UserCheck, UserX } from 'lucide-react'
 import DeleteUserButton from './DeleteUserButton'
 
@@ -13,7 +13,7 @@ export default async function SuperAdminUsersPage({
   const session = await getSession()
   if (!session || session.role !== 'SUPER_ADMIN') redirect('/login')
 
-  const t = await getT()
+  const { t } = await getServerLanguage()
 
   const roleConfig: Record<string, { label: string; bg: string; color: string }> = {
     PARENT:      { label: t.superAdmin.users.roleParent,         bg: '#dbeafe', color: '#2563eb' },

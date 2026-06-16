@@ -1,17 +1,20 @@
 import { redirect } from 'next/navigation'
 import { getSession } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { getServerLanguage } from '@/lib/i18n/server'
 import { Users, Baby, DoorOpen, Bell, CheckCircle, Calendar } from 'lucide-react'
 
 export default async function AdminDashboardPage() {
   const session = await getSession()
   if (!session || session.role !== 'ADMIN') redirect('/login')
 
+  const { t, isRTL } = await getServerLanguage()
+
   if (!session.kindergartenId) {
     return (
       <div style={{ fontFamily: "'Inter', 'Segoe UI', sans-serif" }}>
         <div style={{ background: 'white', borderRadius: '20px', padding: '40px', textAlign: 'center', boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
-          <p style={{ fontSize: '18px', color: '#374151' }}>Aucune crèche associée à ce compte.</p>
+          <p style={{ fontSize: '18px', color: '#374151' }}>{t.admin.dashboard.noKindergarten}</p>
         </div>
       </div>
     )
@@ -55,29 +58,29 @@ export default async function AdminDashboardPage() {
   })
 
   const stats = [
-    { label: 'Total enfants', value: totalChildren, icon: Baby, color: '#4361EE', bg: 'rgba(67,97,238,0.08)' },
-    { label: 'Parents', value: parents, icon: Users, color: '#F72585', bg: 'rgba(247,37,133,0.08)' },
-    { label: 'Éducatrices', value: teachers, icon: Users, color: '#8b5cf6', bg: 'rgba(139,92,246,0.08)' },
-    { label: 'Classes', value: classrooms.length, icon: DoorOpen, color: '#10b981', bg: 'rgba(16,185,129,0.08)' },
-    { label: "Présents aujourd'hui", value: presentToday, icon: CheckCircle, color: '#10b981', bg: 'rgba(16,185,129,0.08)' },
-    { label: 'Annonces', value: announcements.length, icon: Bell, color: '#f59e0b', bg: 'rgba(245,158,11,0.08)' },
+    { label: t.admin.dashboard.totalChildren, value: totalChildren, icon: Baby, color: '#4361EE', bg: 'rgba(67,97,238,0.08)' },
+    { label: t.admin.dashboard.parents, value: parents, icon: Users, color: '#F72585', bg: 'rgba(247,37,133,0.08)' },
+    { label: t.admin.dashboard.teachers, value: teachers, icon: Users, color: '#8b5cf6', bg: 'rgba(139,92,246,0.08)' },
+    { label: t.admin.dashboard.classrooms, value: classrooms.length, icon: DoorOpen, color: '#10b981', bg: 'rgba(16,185,129,0.08)' },
+    { label: t.admin.dashboard.presentToday, value: presentToday, icon: CheckCircle, color: '#10b981', bg: 'rgba(16,185,129,0.08)' },
+    { label: t.admin.dashboard.announcements, value: announcements.length, icon: Bell, color: '#f59e0b', bg: 'rgba(245,158,11,0.08)' },
   ]
 
   const announcementBadge: Record<string, { bg: string; color: string; label: string }> = {
-    MEETING: { bg: '#ede9fe', color: '#7c3aed', label: 'Réunion' },
-    OUTING: { bg: '#d1fae5', color: '#059669', label: 'Sortie' },
-    EVENT: { bg: '#fef3c7', color: '#d97706', label: 'Événement' },
-    INFO: { bg: '#dbeafe', color: '#2563eb', label: 'Info' },
+    MEETING: { bg: '#ede9fe', color: '#7c3aed', label: t.admin.dashboard.badgeMeeting },
+    OUTING: { bg: '#d1fae5', color: '#059669', label: t.admin.dashboard.badgeOuting },
+    EVENT: { bg: '#fef3c7', color: '#d97706', label: t.admin.dashboard.badgeEvent },
+    INFO: { bg: '#dbeafe', color: '#2563eb', label: t.admin.dashboard.badgeInfo },
   }
 
   return (
     <div style={{ fontFamily: "'Inter', 'Segoe UI', sans-serif", maxWidth: '1200px' }}>
       <div style={{ marginBottom: '32px' }}>
         <h1 style={{ fontSize: '28px', fontWeight: '800', color: '#0f172a', margin: '0 0 6px', letterSpacing: '-0.5px' }}>
-          Tableau de bord 🏫
+          {t.admin.dashboard.title} 🏫
         </h1>
         <p style={{ fontSize: '15px', color: '#64748b', margin: 0 }}>
-          Bonjour {session.firstName} — Vue d&apos;ensemble de votre crèche
+          {t.admin.dashboard.subtitle.replace('{name}', session.firstName)}
         </p>
       </div>
 
@@ -102,9 +105,9 @@ export default async function AdminDashboardPage() {
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: '24px', marginBottom: '24px' }}>
         {/* Classes overview */}
         <div style={{ background: 'white', borderRadius: '20px', padding: '24px', boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
-          <h2 style={{ margin: '0 0 20px', fontSize: '17px', fontWeight: '700', color: '#0f172a' }}>Classes</h2>
+          <h2 style={{ margin: '0 0 20px', fontSize: '17px', fontWeight: '700', color: '#0f172a' }}>{t.admin.dashboard.classrooms}</h2>
           {classrooms.length === 0 ? (
-            <p style={{ color: '#94a3b8', fontSize: '14px', textAlign: 'center', padding: '20px 0' }}>Aucune classe</p>
+            <p style={{ color: '#94a3b8', fontSize: '14px', textAlign: 'center', padding: '20px 0' }}>{t.admin.dashboard.noClassrooms}</p>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
               {classrooms.map((cls) => (
@@ -112,12 +115,12 @@ export default async function AdminDashboardPage() {
                   <div>
                     <p style={{ margin: '0 0 3px', fontSize: '14px', fontWeight: '600', color: '#1e293b' }}>{cls.name}</p>
                     <p style={{ margin: 0, fontSize: '12px', color: '#64748b' }}>
-                      {cls.teacher ? `${cls.teacher.firstName} ${cls.teacher.lastName}` : 'Éducatrice non assignée'}
+                      {cls.teacher ? `${cls.teacher.firstName} ${cls.teacher.lastName}` : t.admin.dashboard.unassigned}
                     </p>
                   </div>
-                  <div style={{ textAlign: 'right' }}>
+                  <div style={{ textAlign: isRTL ? 'left' : 'right' }}>
                     <span style={{ padding: '4px 12px', borderRadius: '999px', fontSize: '13px', fontWeight: '700', background: 'rgba(67,97,238,0.1)', color: '#4361EE' }}>
-                      {cls.children.length} élèves
+                      {cls.children.length} {t.admin.dashboard.students}
                     </span>
                   </div>
                 </div>
@@ -128,20 +131,20 @@ export default async function AdminDashboardPage() {
 
         {/* Recent activities */}
         <div style={{ background: 'white', borderRadius: '20px', padding: '24px', boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
-          <h2 style={{ margin: '0 0 20px', fontSize: '17px', fontWeight: '700', color: '#0f172a' }}>Activités récentes</h2>
+          <h2 style={{ margin: '0 0 20px', fontSize: '17px', fontWeight: '700', color: '#0f172a' }}>{t.admin.dashboard.recentActivities}</h2>
           {activities.length === 0 ? (
-            <p style={{ color: '#94a3b8', fontSize: '14px', textAlign: 'center', padding: '20px 0' }}>Aucune activité</p>
+            <p style={{ color: '#94a3b8', fontSize: '14px', textAlign: 'center', padding: '20px 0' }}>{t.admin.dashboard.noActivities}</p>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
               {activities.map((act) => (
-                <div key={act.id} style={{ padding: '14px', background: '#f8fafc', borderRadius: '12px', borderLeft: '3px solid #4361EE' }}>
+                <div key={act.id} style={{ padding: '14px', background: '#f8fafc', borderRadius: '12px', borderLeft: isRTL ? 'none' : '3px solid #4361EE', borderRight: isRTL ? '3px solid #4361EE' : 'none' }}>
                   <p style={{ margin: '0 0 4px', fontSize: '14px', fontWeight: '600', color: '#1e293b' }}>{act.title}</p>
                   <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
                     <span style={{ fontSize: '12px', color: '#94a3b8' }}>📚 {act.classroom.name}</span>
                     <span style={{ fontSize: '12px', color: '#94a3b8' }}>
-                      📅 {new Date(act.activityDate).toLocaleDateString('fr-FR')}
+                      📅 {new Date(act.activityDate).toLocaleDateString(isRTL ? 'ar-EG' : 'fr-FR')}
                     </span>
-                    <span style={{ fontSize: '12px', color: '#94a3b8' }}>📷 {act.media.length} photo(s)</span>
+                    <span style={{ fontSize: '12px', color: '#94a3b8' }}>📷 {act.media.length} {t.admin.dashboard.photos}</span>
                   </div>
                 </div>
               ))}
@@ -153,11 +156,11 @@ export default async function AdminDashboardPage() {
       {/* Announcements */}
       <div style={{ background: 'white', borderRadius: '20px', padding: '24px', boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-          <h2 style={{ margin: 0, fontSize: '17px', fontWeight: '700', color: '#0f172a' }}>Dernières annonces</h2>
-          <a href="/admin/announcements" style={{ fontSize: '13px', color: '#4361EE', textDecoration: 'none', fontWeight: '500' }}>Voir tout</a>
+          <h2 style={{ margin: 0, fontSize: '17px', fontWeight: '700', color: '#0f172a' }}>{t.admin.dashboard.latestAnnouncements}</h2>
+          <a href="/admin/announcements" style={{ fontSize: '13px', color: '#4361EE', textDecoration: 'none', fontWeight: '500' }}>{t.admin.dashboard.seeAll}</a>
         </div>
         {announcements.length === 0 ? (
-          <p style={{ color: '#94a3b8', fontSize: '14px', textAlign: 'center', padding: '20px 0' }}>Aucune annonce</p>
+          <p style={{ color: '#94a3b8', fontSize: '14px', textAlign: 'center', padding: '20px 0' }}>{t.admin.dashboard.noAnnouncements}</p>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
             {announcements.map((ann) => {
@@ -168,7 +171,7 @@ export default async function AdminDashboardPage() {
                   <div style={{ flex: 1 }}>
                     <p style={{ margin: '0 0 2px', fontSize: '14px', fontWeight: '600', color: '#1e293b' }}>{ann.title}</p>
                     <p style={{ margin: 0, fontSize: '12px', color: '#94a3b8' }}>
-                      {ann.createdBy.firstName} {ann.createdBy.lastName} · {new Date(ann.createdAt).toLocaleDateString('fr-FR')}
+                      {ann.createdBy.firstName} {ann.createdBy.lastName} · {new Date(ann.createdAt).toLocaleDateString(isRTL ? 'ar-EG' : 'fr-FR')}
                     </p>
                   </div>
                 </div>

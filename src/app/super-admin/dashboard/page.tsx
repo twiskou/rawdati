@@ -1,14 +1,14 @@
 import { redirect } from 'next/navigation'
 import { getSession } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
-import { getT } from '@/lib/i18n/server'
+import { getServerLanguage } from '@/lib/i18n/server'
 import { Building2, Users, Baby, TrendingUp, CheckCircle, ShieldCheck } from 'lucide-react'
 
 export default async function SuperAdminDashboardPage() {
   const session = await getSession()
   if (!session || session.role !== 'SUPER_ADMIN') redirect('/login')
 
-  const t = await getT()
+  const { t } = await getServerLanguage()
 
   const [totalKindergartens, totalUsers, totalChildren, activeKindergartens] = await Promise.all([
     prisma.kindergarten.count(),

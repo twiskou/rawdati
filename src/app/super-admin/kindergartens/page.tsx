@@ -1,14 +1,14 @@
 import { redirect } from 'next/navigation'
 import { getSession } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
-import { getT } from '@/lib/i18n/server'
+import { getServerLanguage } from '@/lib/i18n/server'
 import KindergartensClient from './KindergartensClient'
 
 export default async function SuperAdminKindergartensPage() {
   const session = await getSession()
   if (!session || session.role !== 'SUPER_ADMIN') redirect('/login')
 
-  const t = await getT()
+  const { t } = await getServerLanguage()
 
   const kindergartens = await prisma.kindergarten.findMany({
     orderBy: { createdAt: 'desc' },

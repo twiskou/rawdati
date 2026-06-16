@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation'
 import { getSession } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { Calendar, Image } from 'lucide-react'
+import { getServerLanguage } from '@/lib/i18n/server'
 
 export default async function AdminActivitiesPage({
   searchParams,
@@ -35,14 +36,17 @@ export default async function AdminActivitiesPage({
     orderBy: { activityDate: 'desc' },
   })
 
+  const { t, isRTL } = await getServerLanguage()
+  const tr = t.admin.activities
+
   return (
-    <div style={{ fontFamily: "'Inter', 'Segoe UI', sans-serif", maxWidth: '1100px' }}>
+    <div style={{ fontFamily: "'Inter', 'Segoe UI', sans-serif", maxWidth: '1100px', direction: isRTL ? 'rtl' : 'ltr' }}>
       <div style={{ marginBottom: '28px' }}>
         <h1 style={{ fontSize: '28px', fontWeight: '800', color: '#0f172a', margin: '0 0 6px', letterSpacing: '-0.5px' }}>
-          Activités
+          {tr.title}
         </h1>
         <p style={{ fontSize: '15px', color: '#64748b', margin: 0 }}>
-          {activities.length} activité(s) — Vue globale de toutes les classes
+          {tr.subtitle.replace('{count}', activities.length.toString())}
         </p>
       </div>
 
@@ -54,7 +58,7 @@ export default async function AdminActivitiesPage({
           display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center',
         }}
       >
-        <span style={{ fontSize: '13px', fontWeight: '600', color: '#94a3b8', marginRight: '4px' }}>Filtrer par classe :</span>
+        <span style={{ fontSize: '13px', fontWeight: '600', color: '#94a3b8', [isRTL ? 'marginLeft' : 'marginRight']: '4px' }}>{tr.filterClass}</span>
         <a
           href="/admin/activities"
           style={{
@@ -63,7 +67,7 @@ export default async function AdminActivitiesPage({
             color: !classroomFilter ? 'white' : '#64748b',
           }}
         >
-          Toutes
+          {tr.all}
         </a>
         {classrooms.map((cls) => (
           <a
@@ -88,7 +92,7 @@ export default async function AdminActivitiesPage({
           }}
         >
           <p style={{ fontSize: '64px', margin: '0 0 16px' }}>🎨</p>
-          <p style={{ fontSize: '18px', fontWeight: '600', color: '#374151', margin: 0 }}>Aucune activité</p>
+          <p style={{ fontSize: '18px', fontWeight: '600', color: '#374151', margin: 0 }}>{tr.noActivities}</p>
         </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
@@ -130,11 +134,11 @@ export default async function AdminActivitiesPage({
                 <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
                   <span style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '12px', color: '#94a3b8' }}>
                     <Calendar size={12} />
-                    {new Date(activity.activityDate).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}
+                    {new Date(activity.activityDate).toLocaleDateString(isRTL ? 'ar-EG' : 'fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}
                   </span>
                   <span style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '12px', color: '#94a3b8' }}>
                     <Image size={12} />
-                    {activity.media.length} photo(s)
+                    {tr.photos.replace('{count}', activity.media.length.toString())}
                   </span>
                   <span
                     style={{
@@ -145,7 +149,7 @@ export default async function AdminActivitiesPage({
                     {activity.classroom.name}
                   </span>
                   <span style={{ fontSize: '12px', color: '#94a3b8' }}>
-                    Par {activity.createdBy.firstName} {activity.createdBy.lastName}
+                    {tr.by.replace('{name}', `${activity.createdBy.firstName} ${activity.createdBy.lastName}`)}
                   </span>
                 </div>
               </div>
@@ -158,7 +162,7 @@ export default async function AdminActivitiesPage({
                     border: 'none', cursor: 'pointer', fontSize: '13px', fontWeight: '500', color: '#ef4444',
                   }}
                 >
-                  Supprimer
+                  {tr.delete}
                 </button>
               </div>
             </div>

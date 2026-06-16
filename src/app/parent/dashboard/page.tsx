@@ -4,13 +4,13 @@ import { prisma } from '@/lib/prisma'
 import Link from 'next/link'
 import { MessageCircle, TrendingUp, Image, Bell, CheckCircle, Calendar, Utensils, Baby, ClipboardList } from 'lucide-react'
 import { QuickLinkCard } from './QuickLinkCard'
-import { getT } from '@/lib/i18n/server'
+import { getServerLanguage } from '@/lib/i18n/server'
 
 export default async function ParentDashboardPage() {
   const session = await getSession()
   if (!session || session.role !== 'PARENT') redirect('/login')
 
-  const t = await getT()
+  const { t } = await getServerLanguage()
 
   // Fetch parent's children with current month attendances
   const parentChildren = await prisma.parentChild.findMany({

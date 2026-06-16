@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation'
 import { getSession } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
-import { getT } from '@/lib/i18n/server'
+import { getServerLanguage } from '@/lib/i18n/server'
 import { CheckCircle, Clock, AlertTriangle, CreditCard } from 'lucide-react'
 
 // Since there's no Subscription model in the schema, we simulate subscription data
@@ -11,7 +11,7 @@ export default async function SuperAdminSubscriptionsPage() {
   const session = await getSession()
   if (!session || session.role !== 'SUPER_ADMIN') redirect('/login')
 
-  const t = await getT()
+  const { t } = await getServerLanguage()
 
   function getSubscriptionStatus(createdAt: Date): { status: string; label: string; daysLeft: number } {
     const now = new Date()

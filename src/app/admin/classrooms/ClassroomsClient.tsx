@@ -5,6 +5,7 @@ import {
   Plus, X, Edit2, Trash2, Users, User, ChevronDown,
   ChevronUp, BookOpen, AlertTriangle, CheckCircle,
 } from 'lucide-react'
+import { useLanguage } from '@/lib/i18n/LanguageContext'
 
 interface Teacher {
   id: string
@@ -47,6 +48,9 @@ export default function ClassroomsClient({ classrooms: initial, teachers }: Clas
   const [classrooms, setClassrooms] = useState<Classroom[]>(initial)
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null)
   const [isPending, startTransition] = useTransition()
+
+  const { t, isRTL } = useLanguage()
+  const tr = t.admin.classrooms
 
   // Form modal
   const [showForm, setShowForm] = useState(false)
@@ -158,10 +162,10 @@ export default function ClassroomsClient({ classrooms: initial, teachers }: Clas
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '28px', flexWrap: 'wrap', gap: '16px' }}>
         <div>
           <h1 style={{ fontSize: '28px', fontWeight: '800', color: '#0f172a', margin: '0 0 6px', letterSpacing: '-0.5px' }}>
-            Classes
+            {tr.title}
           </h1>
           <p style={{ fontSize: '15px', color: '#64748b', margin: 0 }}>
-            {classrooms.length} classe{classrooms.length !== 1 ? 's' : ''} • {classrooms.reduce((n, c) => n + c.children.length, 0)} enfants
+            {tr.subtitle.replace('{count}', classrooms.length.toString()).replace('{children}', classrooms.reduce((n, c) => n + c.children.length, 0).toString())}
           </p>
         </div>
         <button
@@ -177,7 +181,7 @@ export default function ClassroomsClient({ classrooms: initial, teachers }: Clas
           onMouseOver={e => { e.currentTarget.style.opacity = '0.9'; e.currentTarget.style.transform = 'translateY(-1px)' }}
           onMouseOut={e => { e.currentTarget.style.opacity = '1'; e.currentTarget.style.transform = 'translateY(0)' }}
         >
-          <Plus size={16} /> Nouvelle classe
+          <Plus size={16} /> {tr.newClass}
         </button>
       </div>
 
@@ -201,10 +205,10 @@ export default function ClassroomsClient({ classrooms: initial, teachers }: Clas
       {classrooms.length > 0 && (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '14px', marginBottom: '28px' }}>
           {[
-            { label: 'Classes', value: classrooms.length, color: '#4361EE', icon: '🏫' },
-            { label: 'Enseignants', value: classrooms.filter(c => c.teacher).length, color: '#F72585', icon: '👩‍🏫' },
-            { label: 'Enfants inscrits', value: classrooms.reduce((n, c) => n + c.children.length, 0), color: '#10b981', icon: '👶' },
-            { label: 'Moy. par classe', value: classrooms.length ? Math.round(classrooms.reduce((n, c) => n + c.children.length, 0) / classrooms.length) : 0, color: '#f59e0b', icon: '📊' },
+            { label: tr.totalClasses, value: classrooms.length, color: '#4361EE', icon: '🏫' },
+            { label: tr.teachers, value: classrooms.filter(c => c.teacher).length, color: '#F72585', icon: '👩‍🏫' },
+            { label: tr.enrolled, value: classrooms.reduce((n, c) => n + c.children.length, 0), color: '#10b981', icon: '👶' },
+            { label: tr.avgPerClass, value: classrooms.length ? Math.round(classrooms.reduce((n, c) => n + c.children.length, 0) / classrooms.length) : 0, color: '#f59e0b', icon: '📊' },
           ].map(s => (
             <div key={s.label} style={{ background: 'white', borderRadius: '14px', padding: '16px 18px', boxShadow: '0 2px 10px rgba(0,0,0,0.05)', display: 'flex', alignItems: 'center', gap: '12px' }}>
               <span style={{ fontSize: '26px' }}>{s.icon}</span>
@@ -221,14 +225,14 @@ export default function ClassroomsClient({ classrooms: initial, teachers }: Clas
       {classrooms.length === 0 ? (
         <div style={{ background: 'white', borderRadius: '24px', padding: '80px 60px', textAlign: 'center', boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
           <p style={{ fontSize: '72px', margin: '0 0 16px' }}>🏫</p>
-          <p style={{ fontSize: '20px', fontWeight: '700', color: '#374151', margin: '0 0 8px' }}>Aucune classe créée</p>
-          <p style={{ color: '#64748b', margin: '0 0 24px', fontSize: '15px' }}>Commencez par créer votre première classe</p>
+          <p style={{ fontSize: '20px', fontWeight: '700', color: '#374151', margin: '0 0 8px' }}>{tr.noClasses}</p>
+          <p style={{ color: '#64748b', margin: '0 0 24px', fontSize: '15px' }}>{tr.noClassesDesc}</p>
           <button
             onClick={openCreate}
             style={{ padding: '12px 28px', background: 'linear-gradient(135deg, #F72585, #4361EE)', border: 'none', borderRadius: '12px', color: 'white', fontSize: '14px', fontWeight: '600', cursor: 'pointer' }}
           >
             <Plus size={16} style={{ marginRight: 6, verticalAlign: 'middle' }} />
-            Créer une classe
+            {tr.createClass}
           </button>
         </div>
       ) : (
@@ -265,13 +269,13 @@ export default function ClassroomsClient({ classrooms: initial, teachers }: Clas
                         </h3>
                       </div>
                       {cls.description && (
-                        <p style={{ margin: '0 0 0 48px', fontSize: '12px', color: '#94a3b8', lineHeight: '1.4' }}>{cls.description}</p>
+                        <p style={{ margin: isRTL ? '0 48px 0 0' : '0 0 0 48px', fontSize: '12px', color: '#94a3b8', lineHeight: '1.4' }}>{cls.description}</p>
                       )}
                     </div>
-                    <div style={{ display: 'flex', gap: '4px', marginLeft: '8px', flexShrink: 0 }}>
+                    <div style={{ display: 'flex', gap: '4px', [isRTL ? 'marginRight' : 'marginLeft']: '8px', flexShrink: 0 }}>
                       <button
                         onClick={() => openEdit(cls)}
-                        title="Modifier"
+                        title={tr.edit}
                         style={{ width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '8px', background: '#f1f5f9', border: 'none', cursor: 'pointer', transition: 'background 0.15s' }}
                         onMouseOver={e => (e.currentTarget.style.background = '#e2e8f0')}
                         onMouseOut={e => (e.currentTarget.style.background = '#f1f5f9')}
@@ -280,7 +284,7 @@ export default function ClassroomsClient({ classrooms: initial, teachers }: Clas
                       </button>
                       <button
                         onClick={() => { setDeleteId(cls.id); setDeleteName(cls.name) }}
-                        title="Supprimer"
+                        title={tr.deleteBtn}
                         style={{ width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '8px', background: '#fee2e2', border: 'none', cursor: 'pointer', transition: 'background 0.15s' }}
                         onMouseOver={e => (e.currentTarget.style.background = '#fecaca')}
                         onMouseOut={e => (e.currentTarget.style.background = '#fee2e2')}
@@ -296,26 +300,26 @@ export default function ClassroomsClient({ classrooms: initial, teachers }: Clas
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '9px 12px', background: '#f8fafc', borderRadius: '10px' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                         <User size={13} color="#94a3b8" />
-                        <span style={{ fontSize: '12px', color: '#94a3b8' }}>Éducatrice</span>
+                        <span style={{ fontSize: '12px', color: '#94a3b8' }}>{tr.teacher}</span>
                       </div>
                       <span style={{ fontSize: '13px', fontWeight: '600', color: cls.teacher ? '#374151' : '#cbd5e1' }}>
-                        {cls.teacher ? `${cls.teacher.firstName} ${cls.teacher.lastName}` : 'Non assignée'}
+                        {cls.teacher ? `${cls.teacher.firstName} ${cls.teacher.lastName}` : tr.unassigned}
                       </span>
                     </div>
                     {/* Children count */}
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '9px 12px', background: '#f8fafc', borderRadius: '10px' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                         <Users size={13} color="#94a3b8" />
-                        <span style={{ fontSize: '12px', color: '#94a3b8' }}>Élèves</span>
+                        <span style={{ fontSize: '12px', color: '#94a3b8' }}>{tr.students}</span>
                       </div>
                       <span style={{ fontSize: '18px', fontWeight: '800', color: clr.border }}>{cls.children.length}</span>
                     </div>
                     {/* Last activity */}
                     {cls.activities[0] && (
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '9px 12px', background: '#f8fafc', borderRadius: '10px' }}>
-                        <span style={{ fontSize: '12px', color: '#94a3b8' }}>Dernière activité</span>
+                        <span style={{ fontSize: '12px', color: '#94a3b8' }}>{tr.lastActivity}</span>
                         <span style={{ fontSize: '12px', fontWeight: '600', color: '#374151' }}>
-                          {new Date(cls.activities[0].activityDate).toLocaleDateString('fr-FR')}
+                          {new Date(cls.activities[0].activityDate).toLocaleDateString(isRTL ? 'ar-EG' : 'fr-FR')}
                         </span>
                       </div>
                     )}
@@ -335,7 +339,7 @@ export default function ClassroomsClient({ classrooms: initial, teachers }: Clas
                       onMouseOver={e => (e.currentTarget.style.opacity = '0.8')}
                       onMouseOut={e => (e.currentTarget.style.opacity = '1')}
                     >
-                      <Users size={14} /> Voir élèves
+                      <Users size={14} /> {tr.viewStudents}
                     </button>
                     <button
                       onClick={() => openEdit(cls)}
@@ -349,7 +353,7 @@ export default function ClassroomsClient({ classrooms: initial, teachers }: Clas
                       onMouseOver={e => (e.currentTarget.style.background = '#e2e8f0')}
                       onMouseOut={e => (e.currentTarget.style.background = '#f1f5f9')}
                     >
-                      <Edit2 size={14} /> Modifier
+                      <Edit2 size={14} /> {tr.edit}
                     </button>
                   </div>
                 </div>
@@ -366,16 +370,16 @@ export default function ClassroomsClient({ classrooms: initial, teachers }: Clas
           onClick={closeForm}
         >
           <div
-            style={{ background: 'white', borderRadius: '24px', padding: '36px', width: '100%', maxWidth: '500px', boxShadow: '0 32px 80px rgba(0,0,0,0.2)' }}
+            style={{ background: 'white', borderRadius: '24px', padding: '36px', width: '100%', maxWidth: '500px', boxShadow: '0 32px 80px rgba(0,0,0,0.2)', direction: isRTL ? 'rtl' : 'ltr' }}
             onClick={e => e.stopPropagation()}
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
               <div>
                 <h2 style={{ margin: '0 0 4px', fontSize: '20px', fontWeight: '800', color: '#0f172a' }}>
-                  {editId ? 'Modifier la classe' : 'Nouvelle classe'}
+                  {editId ? tr.editClass : tr.newClass}
                 </h2>
                 <p style={{ margin: 0, fontSize: '13px', color: '#94a3b8' }}>
-                  {editId ? 'Modifiez les informations de la classe' : 'Remplissez les informations de la classe'}
+                  {editId ? tr.editDesc : tr.newDesc}
                 </p>
               </div>
               <button onClick={closeForm} style={{ background: '#f1f5f9', border: 'none', borderRadius: '10px', cursor: 'pointer', padding: '8px', display: 'flex' }}>
@@ -386,42 +390,40 @@ export default function ClassroomsClient({ classrooms: initial, teachers }: Clas
             <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
               <div>
                 <label style={{ display: 'block', fontSize: '12px', fontWeight: '700', color: '#374151', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
-                  Nom de la classe *
+                  {tr.className}
                 </label>
                 <input
                   type="text"
                   value={formName}
                   onChange={e => setFormName(e.target.value)}
                   required
-                  placeholder="Ex: Les Petits Lions"
-                  style={inputStyle}
+                  style={{ ...inputStyle, textAlign: isRTL ? 'right' : 'left' }}
                   autoFocus
                 />
               </div>
 
               <div>
                 <label style={{ display: 'block', fontSize: '12px', fontWeight: '700', color: '#374151', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
-                  Description
+                  {tr.description}
                 </label>
                 <textarea
                   value={formDesc}
                   onChange={e => setFormDesc(e.target.value)}
-                  placeholder="Description optionnelle..."
                   rows={2}
-                  style={{ ...inputStyle, resize: 'vertical', lineHeight: '1.5' }}
+                  style={{ ...inputStyle, resize: 'vertical', lineHeight: '1.5', textAlign: isRTL ? 'right' : 'left' }}
                 />
               </div>
 
               <div>
                 <label style={{ display: 'block', fontSize: '12px', fontWeight: '700', color: '#374151', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
-                  Éducatrice / Enseignant
+                  {tr.teacherLabel}
                 </label>
                 <select
                   value={formTeacherId}
                   onChange={e => setFormTeacherId(e.target.value)}
-                  style={{ ...inputStyle, cursor: 'pointer' }}
+                  style={{ ...inputStyle, cursor: 'pointer', textAlign: isRTL ? 'right' : 'left' }}
                 >
-                  <option value="">— Non assigné —</option>
+                  <option value="">{tr.noTeacherOpt}</option>
                   {teachers.map(t => (
                     <option key={t.id} value={t.id}>
                       {t.firstName} {t.lastName}
@@ -436,7 +438,7 @@ export default function ClassroomsClient({ classrooms: initial, teachers }: Clas
                   onClick={closeForm}
                   style={{ flex: 1, padding: '13px', border: '1.5px solid #e2e8f0', borderRadius: '12px', background: 'white', fontSize: '14px', fontWeight: '600', cursor: 'pointer', color: '#374151' }}
                 >
-                  Annuler
+                  {tr.cancel}
                 </button>
                 <button
                   type="submit"
@@ -450,7 +452,7 @@ export default function ClassroomsClient({ classrooms: initial, teachers }: Clas
                     boxShadow: isPending ? 'none' : '0 4px 14px rgba(247,37,133,0.3)',
                   }}
                 >
-                  {isPending ? 'Enregistrement...' : (editId ? '✅ Enregistrer' : '✨ Créer la classe')}
+                  {isPending ? '...' : (editId ? `✅ ${tr.save}` : `✨ ${tr.createBtn}`)}
                 </button>
               </div>
             </form>
@@ -465,32 +467,32 @@ export default function ClassroomsClient({ classrooms: initial, teachers }: Clas
           onClick={() => setDeleteId(null)}
         >
           <div
-            style={{ background: 'white', borderRadius: '24px', padding: '36px', width: '100%', maxWidth: '420px', boxShadow: '0 32px 80px rgba(0,0,0,0.2)', textAlign: 'center' }}
+            style={{ background: 'white', borderRadius: '24px', padding: '36px', width: '100%', maxWidth: '420px', boxShadow: '0 32px 80px rgba(0,0,0,0.2)', textAlign: 'center', direction: isRTL ? 'rtl' : 'ltr' }}
             onClick={e => e.stopPropagation()}
           >
             <div style={{ width: '64px', height: '64px', borderRadius: '50%', background: '#fee2e2', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px' }}>
               <Trash2 size={28} color="#ef4444" />
             </div>
             <h2 style={{ margin: '0 0 8px', fontSize: '20px', fontWeight: '800', color: '#0f172a' }}>
-              Supprimer la classe ?
+              {tr.deleteTitle}
             </h2>
             <p style={{ margin: '0 0 8px', fontSize: '15px', color: '#374151', fontWeight: '600' }}>"{deleteName}"</p>
             <p style={{ margin: '0 0 28px', fontSize: '13px', color: '#94a3b8', lineHeight: '1.5' }}>
-              Cette action est irréversible. Tous les enfants et activités liés à cette classe seront dissociés.
+              {tr.deleteDesc}
             </p>
             <div style={{ display: 'flex', gap: '12px' }}>
               <button
                 onClick={() => setDeleteId(null)}
                 style={{ flex: 1, padding: '13px', border: '1.5px solid #e2e8f0', borderRadius: '12px', background: 'white', fontSize: '14px', fontWeight: '600', cursor: 'pointer', color: '#374151' }}
               >
-                Annuler
+                {tr.cancel}
               </button>
               <button
                 onClick={handleDelete}
                 disabled={isPending}
                 style={{ flex: 1, padding: '13px', background: isPending ? '#9ca3af' : '#ef4444', border: 'none', borderRadius: '12px', color: 'white', fontSize: '14px', fontWeight: '700', cursor: isPending ? 'not-allowed' : 'pointer' }}
               >
-                {isPending ? 'Suppression...' : '🗑️ Supprimer'}
+                {isPending ? '...' : `🗑️ ${tr.deleteBtn}`}
               </button>
             </div>
           </div>
@@ -514,7 +516,7 @@ export default function ClassroomsClient({ classrooms: initial, teachers }: Clas
                   {viewStudentsFor.name}
                 </h2>
                 <p style={{ margin: 0, fontSize: '13px', color: '#94a3b8' }}>
-                  {viewStudentsFor.children.length} élève{viewStudentsFor.children.length !== 1 ? 's' : ''}
+                  {viewStudentsFor.children.length} {tr.students.toLowerCase()}
                   {viewStudentsFor.teacher && ` · ${viewStudentsFor.teacher.firstName} ${viewStudentsFor.teacher.lastName}`}
                 </p>
               </div>
@@ -524,12 +526,12 @@ export default function ClassroomsClient({ classrooms: initial, teachers }: Clas
             </div>
 
             {/* Student list */}
-            <div style={{ overflowY: 'auto', flex: 1 }}>
+            <div style={{ overflowY: 'auto', flex: 1, direction: isRTL ? 'rtl' : 'ltr' }}>
               {viewStudentsFor.children.length === 0 ? (
                 <div style={{ textAlign: 'center', padding: '40px 20px' }}>
                   <p style={{ fontSize: '48px', margin: '0 0 12px' }}>👶</p>
-                  <p style={{ fontSize: '15px', fontWeight: '600', color: '#374151', margin: '0 0 6px' }}>Aucun élève dans cette classe</p>
-                  <p style={{ fontSize: '13px', color: '#94a3b8', margin: 0 }}>Assignez des enfants depuis la page Enfants</p>
+                  <p style={{ fontSize: '15px', fontWeight: '600', color: '#374151', margin: '0 0 6px' }}>{tr.noStudents}</p>
+                  <p style={{ fontSize: '13px', color: '#94a3b8', margin: 0 }}>{tr.noStudentsDesc}</p>
                 </div>
               ) : (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
@@ -556,7 +558,7 @@ export default function ClassroomsClient({ classrooms: initial, teachers }: Clas
                           : `${child.firstName[0]}${child.lastName[0]}`
                         }
                       </div>
-                      <div style={{ flex: 1 }}>
+                      <div style={{ flex: 1, textAlign: isRTL ? 'right' : 'left' }}>
                         <p style={{ margin: '0 0 2px', fontSize: '14px', fontWeight: '700', color: '#0f172a' }}>
                           {child.firstName} {child.lastName}
                         </p>
@@ -569,7 +571,7 @@ export default function ClassroomsClient({ classrooms: initial, teachers }: Clas
                         background: child.gender === 'MALE' ? '#dbeafe' : '#fce7f3',
                         color: child.gender === 'MALE' ? '#2563eb' : '#be185d',
                       }}>
-                        {child.gender === 'MALE' ? '👦 Garçon' : '👧 Fille'}
+                        {child.gender === 'MALE' ? `👦 ${tr.boy}` : `👧 ${tr.girl}`}
                       </span>
                     </div>
                   ))}

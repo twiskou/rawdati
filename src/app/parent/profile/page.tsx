@@ -2,7 +2,7 @@ import { redirect } from 'next/navigation'
 import { getSession } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import ProfileForm from './ProfileForm'
-import { getT } from '@/lib/i18n/server'
+import { getServerLanguage } from '@/lib/i18n/server'
 
 export default async function ParentProfilePage() {
   const session = await getSession()
@@ -11,7 +11,7 @@ export default async function ParentProfilePage() {
   const user = await prisma.user.findUnique({ where: { id: session.id } })
   if (!user) redirect('/login')
 
-  const t = await getT()
+  const { t, isRTL } = await getServerLanguage()
 
   return (
     <div style={{ fontFamily: "'Inter', 'Segoe UI', sans-serif" }}>

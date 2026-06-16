@@ -5,6 +5,7 @@ import {
   Plus, X, Search, UserCheck, UserX, Edit2, Trash2,
   AlertTriangle, CheckCircle, Eye, EyeOff, Users, GraduationCap, UserPlus,
 } from 'lucide-react'
+import { useLanguage } from '@/lib/i18n/LanguageContext'
 
 interface Classroom { id: string; name: string }
 
@@ -28,17 +29,21 @@ interface UsersClientProps {
   classrooms: Classroom[]
 }
 
-const ROLE_CFG = {
-  TEACHER: { label: 'Éducatrice', bg: '#d1fae5', color: '#059669', icon: '👩‍🏫' },
-  PARENT: { label: 'Parent', bg: '#dbeafe', color: '#2563eb', icon: '👨‍👩‍👧' },
-}
-
 export default function UsersClient({ users: initial, classrooms }: UsersClientProps) {
-  const [users, setUsers] = useState<User[]>(initial)
+  const [users, setUsers] = useState(initial)
   const [search, setSearch] = useState('')
-  const [roleFilter, setRoleFilter] = useState<'' | 'TEACHER' | 'PARENT'>('')
+  const [roleFilter, setRoleFilter] = useState('')
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null)
+
   const [isPending, startTransition] = useTransition()
+  
+  const { t, isRTL } = useLanguage()
+  const tr = t.admin.users
+
+  const ROLE_CFG = {
+    TEACHER: { label: tr.teachers, bg: '#d1fae5', color: '#059669', icon: '👩‍🏫' },
+    PARENT: { label: tr.parents, bg: '#dbeafe', color: '#2563eb', icon: '👨‍👩‍👧' },
+  }
 
   // Form modal
   const [showForm, setShowForm] = useState(false)
@@ -171,10 +176,10 @@ export default function UsersClient({ users: initial, classrooms }: UsersClientP
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '24px', flexWrap: 'wrap', gap: '16px' }}>
         <div>
           <h1 style={{ fontSize: '28px', fontWeight: '800', color: '#0f172a', margin: '0 0 6px', letterSpacing: '-0.5px' }}>
-            Utilisateurs
+            {tr.title}
           </h1>
           <p style={{ fontSize: '15px', color: '#64748b', margin: 0 }}>
-            {teachers.length} éducatrice{teachers.length !== 1 ? 's' : ''} · {parents.length} parent{parents.length !== 1 ? 's' : ''}
+            {tr.subtitle.replace('{teachers}', teachers.length.toString()).replace('{parents}', parents.length.toString())}
           </p>
         </div>
         <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
@@ -184,7 +189,7 @@ export default function UsersClient({ users: initial, classrooms }: UsersClientP
             onMouseOver={e => (e.currentTarget.style.opacity = '0.9')}
             onMouseOut={e => (e.currentTarget.style.opacity = '1')}
           >
-            <GraduationCap size={15} /> Ajouter éducatrice
+            <GraduationCap size={15} /> {tr.addTeacher}
           </button>
           <button
             onClick={() => openCreate('PARENT')}
@@ -192,7 +197,7 @@ export default function UsersClient({ users: initial, classrooms }: UsersClientP
             onMouseOver={e => (e.currentTarget.style.opacity = '0.9')}
             onMouseOut={e => (e.currentTarget.style.opacity = '1')}
           >
-            <UserPlus size={15} /> Ajouter parent
+            <UserPlus size={15} /> {tr.addParent}
           </button>
         </div>
       </div>
@@ -208,10 +213,10 @@ export default function UsersClient({ users: initial, classrooms }: UsersClientP
       {/* Stats */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '14px', marginBottom: '24px' }}>
         {[
-          { label: 'Éducatrices', value: teachers.length, color: '#059669', icon: '👩‍🏫', bg: '#d1fae5' },
-          { label: 'Parents', value: parents.length, color: '#2563eb', icon: '👨‍👩‍👧', bg: '#dbeafe' },
-          { label: 'Comptes actifs', value: users.filter(u => u.isActive).length, color: '#10b981', icon: '✅', bg: '#d1fae5' },
-          { label: 'Comptes inactifs', value: users.filter(u => !u.isActive).length, color: '#ef4444', icon: '⛔', bg: '#fee2e2' },
+          { label: tr.teachers, value: teachers.length, color: '#059669', icon: '👩‍🏫', bg: '#d1fae5' },
+          { label: tr.parents, value: parents.length, color: '#2563eb', icon: '👨‍👩‍👧', bg: '#dbeafe' },
+          { label: tr.activeAccounts, value: users.filter(u => u.isActive).length, color: '#10b981', icon: '✅', bg: '#d1fae5' },
+          { label: tr.inactiveAccounts, value: users.filter(u => !u.isActive).length, color: '#ef4444', icon: '⛔', bg: '#fee2e2' },
         ].map(s => (
           <div key={s.label} style={{ background: 'white', borderRadius: '14px', padding: '16px 18px', boxShadow: '0 2px 10px rgba(0,0,0,0.05)', display: 'flex', alignItems: 'center', gap: '12px' }}>
             <div style={{ width: '42px', height: '42px', borderRadius: '10px', background: s.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px', flexShrink: 0 }}>{s.icon}</div>
@@ -226,16 +231,16 @@ export default function UsersClient({ users: initial, classrooms }: UsersClientP
       {/* Filters */}
       <div style={{ background: 'white', borderRadius: '16px', padding: '14px 18px', boxShadow: '0 2px 10px rgba(0,0,0,0.05)', marginBottom: '20px', display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' }}>
         <div style={{ position: 'relative', flex: 1, minWidth: '220px' }}>
-          <Search size={15} color="#94a3b8" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)' }} />
+          <Search size={15} color="#94a3b8" style={{ position: 'absolute', [isRTL ? 'right' : 'left']: '12px', top: '50%', transform: 'translateY(-50%)' }} />
           <input
             value={search}
             onChange={e => setSearch(e.target.value)}
-            placeholder="Rechercher par nom ou email..."
-            style={{ ...inputStyle, paddingLeft: '36px' }}
+            placeholder={tr.search}
+            style={{ ...inputStyle, paddingLeft: isRTL ? '14px' : '36px', paddingRight: isRTL ? '36px' : '14px' }}
           />
         </div>
         <div style={{ display: 'flex', gap: '8px' }}>
-          {([['', 'Tous'], ['TEACHER', '👩‍🏫 Éducatrices'], ['PARENT', '👨‍👩‍👧 Parents']] as const).map(([key, label]) => (
+          {([['', tr.all], ['TEACHER', `👩‍🏫 ${tr.teachers}`], ['PARENT', `👨‍👩‍👧 ${tr.parents}`]] as const).map(([key, label]) => (
             <button
               key={key}
               onClick={() => setRoleFilter(key)}
@@ -252,15 +257,15 @@ export default function UsersClient({ users: initial, classrooms }: UsersClientP
         {filtered.length === 0 ? (
           <div style={{ padding: '60px', textAlign: 'center' }}>
             <p style={{ fontSize: '48px', margin: '0 0 12px' }}>👤</p>
-            <p style={{ fontSize: '16px', fontWeight: '600', color: '#374151', margin: '0 0 6px' }}>Aucun utilisateur trouvé</p>
-            <p style={{ fontSize: '13px', color: '#94a3b8', margin: 0 }}>Ajoutez des éducatrices ou des parents via les boutons ci-dessus</p>
+            <p style={{ fontSize: '16px', fontWeight: '600', color: '#374151', margin: '0 0 6px' }}>{tr.noUsers}</p>
+            <p style={{ fontSize: '13px', color: '#94a3b8', margin: 0 }}>{tr.noUsersDesc}</p>
           </div>
         ) : (
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
               <tr style={{ background: '#f8fafc', borderBottom: '1px solid #f1f5f9' }}>
-                {['Utilisateur', 'Email / Tél.', 'Rôle', 'Classe / Enfants', 'Statut', 'Actions'].map(h => (
-                  <th key={h} style={{ padding: '13px 16px', textAlign: 'left', fontSize: '11px', fontWeight: '700', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.06em', whiteSpace: 'nowrap' }}>{h}</th>
+                {[tr.colUser, tr.colContact, tr.colRole, tr.colClasses, tr.colStatus, tr.colActions].map(h => (
+                  <th key={h} style={{ padding: '13px 16px', textAlign: isRTL ? 'right' : 'left', fontSize: '11px', fontWeight: '700', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.06em', whiteSpace: 'nowrap' }}>{h}</th>
                 ))}
               </tr>
             </thead>
@@ -282,7 +287,7 @@ export default function UsersClient({ users: initial, classrooms }: UsersClientP
                         </div>
                         <div>
                           <p style={{ margin: 0, fontSize: '14px', fontWeight: '700', color: '#1e293b' }}>{u.firstName} {u.lastName}</p>
-                          <p style={{ margin: 0, fontSize: '11px', color: '#94a3b8' }}>Ajouté le {new Date(u.createdAt).toLocaleDateString('fr-FR')}</p>
+                          <p style={{ margin: 0, fontSize: '11px', color: '#94a3b8' }}>{tr.addedOn.replace('{date}', new Date(u.createdAt).toLocaleDateString(isRTL ? 'ar-EG' : 'fr-FR'))}</p>
                         </div>
                       </div>
                     </td>
@@ -302,18 +307,18 @@ export default function UsersClient({ users: initial, classrooms }: UsersClientP
                       {u.role === 'TEACHER' ? (
                         u.taughtClasses.length > 0
                           ? <span style={{ fontSize: '13px', fontWeight: '600', color: '#059669' }}>📚 {u.taughtClasses.map(c => c.name).join(', ')}</span>
-                          : <span style={{ fontSize: '12px', color: '#cbd5e1', fontStyle: 'italic' }}>Non assignée</span>
+                          : <span style={{ fontSize: '12px', color: '#cbd5e1', fontStyle: 'italic' }}>{tr.unassigned}</span>
                       ) : (
                         u.parentChildren.length > 0
                           ? <span style={{ fontSize: '12px', color: '#374151' }}>👶 {u.parentChildren.map(p => p.child.firstName).join(', ')}</span>
-                          : <span style={{ fontSize: '12px', color: '#cbd5e1', fontStyle: 'italic' }}>Aucun enfant</span>
+                          : <span style={{ fontSize: '12px', color: '#cbd5e1', fontStyle: 'italic' }}>{tr.noChild}</span>
                       )}
                     </td>
                     {/* Status */}
                     <td style={{ padding: '13px 16px' }}>
                       <span style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '12px', fontWeight: '600', color: u.isActive ? '#10b981' : '#ef4444' }}>
                         {u.isActive ? <UserCheck size={14} /> : <UserX size={14} />}
-                        {u.isActive ? 'Actif' : 'Inactif'}
+                        {u.isActive ? tr.active : tr.inactive}
                       </span>
                     </td>
                     {/* Actions */}
@@ -325,13 +330,13 @@ export default function UsersClient({ users: initial, classrooms }: UsersClientP
                           onMouseOver={e => (e.currentTarget.style.background = '#e2e8f0')}
                           onMouseOut={e => (e.currentTarget.style.background = '#f1f5f9')}
                         >
-                          <Edit2 size={12} /> Modifier
+                          <Edit2 size={12} /> {tr.edit}
                         </button>
                         <button
                           onClick={() => toggleActive(u)}
                           style={{ padding: '6px 10px', borderRadius: '8px', background: u.isActive ? '#fee2e2' : '#d1fae5', border: 'none', cursor: 'pointer', fontSize: '12px', fontWeight: '500', color: u.isActive ? '#ef4444' : '#059669' }}
                         >
-                          {u.isActive ? 'Désactiver' : 'Activer'}
+                          {u.isActive ? tr.deactivate : tr.activate}
                         </button>
                         <button
                           onClick={() => { setDeleteId(u.id); setDeleteName(`${u.firstName} ${u.lastName}`) }}

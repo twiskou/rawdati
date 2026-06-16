@@ -2,7 +2,7 @@ import { redirect } from 'next/navigation'
 import { getSession } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
-import { getT } from '@/lib/i18n/server'
+import { getServerLanguage } from '@/lib/i18n/server'
 
 export default async function ParentMealsPage({
   searchParams,
@@ -12,7 +12,7 @@ export default async function ParentMealsPage({
   const session = await getSession()
   if (!session || session.role !== 'PARENT') redirect('/login')
 
-  const t = await getT()
+  const { t } = await getServerLanguage()
 
   const params = await searchParams
   const weekOffset = parseInt(params.week ?? '0', 10)

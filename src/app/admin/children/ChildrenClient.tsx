@@ -5,6 +5,7 @@ import {
   Plus, X, Edit2, Trash2, Search, AlertTriangle,
   CheckCircle, Users, Baby,
 } from 'lucide-react'
+import { useLanguage } from '@/lib/i18n/LanguageContext'
 
 interface Classroom { id: string; name: string }
 interface Parent { id: string; firstName: string; lastName: string; email: string }
@@ -33,6 +34,9 @@ export default function ChildrenClient({ children: initial, classrooms, parents 
   const [classroomFilter, setClassroomFilter] = useState('')
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null)
   const [isPending, startTransition] = useTransition()
+
+  const { t, isRTL } = useLanguage()
+  const tr = t.admin.children
 
   // Form modal
   const [showForm, setShowForm] = useState(false)
@@ -78,7 +82,7 @@ export default function ChildrenClient({ children: initial, classrooms, parents 
     const ms = Date.now() - new Date(birth).getTime()
     const yrs = Math.floor(ms / (1000 * 60 * 60 * 24 * 365.25))
     const mos = Math.floor((ms / (1000 * 60 * 60 * 24 * 30.44)) % 12)
-    return yrs > 0 ? `${yrs} an${yrs > 1 ? 's' : ''}` : `${mos} mois`
+    return yrs > 0 ? tr.ageYears.replace('{count}', yrs.toString()) : tr.ageMonths.replace('{count}', mos.toString())
   }
 
   function openCreate() {
@@ -163,9 +167,9 @@ export default function ChildrenClient({ children: initial, classrooms, parents 
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '24px', flexWrap: 'wrap', gap: '16px' }}>
         <div>
-          <h1 style={{ fontSize: '28px', fontWeight: '800', color: '#0f172a', margin: '0 0 6px', letterSpacing: '-0.5px' }}>Enfants</h1>
+          <h1 style={{ fontSize: '28px', fontWeight: '800', color: '#0f172a', margin: '0 0 6px', letterSpacing: '-0.5px' }}>{tr.title}</h1>
           <p style={{ fontSize: '15px', color: '#64748b', margin: 0 }}>
-            {children.length} enfant{children.length !== 1 ? 's' : ''} inscrit{children.length !== 1 ? 's' : ''}
+            {tr.subtitle.replace('{count}', children.length.toString())}
           </p>
         </div>
         <button
@@ -174,7 +178,7 @@ export default function ChildrenClient({ children: initial, classrooms, parents 
           onMouseOver={e => (e.currentTarget.style.opacity = '0.9')}
           onMouseOut={e => (e.currentTarget.style.opacity = '1')}
         >
-          <Plus size={16} /> Ajouter un enfant
+          <Plus size={16} /> {tr.addBtn}
         </button>
       </div>
 
@@ -189,11 +193,11 @@ export default function ChildrenClient({ children: initial, classrooms, parents 
       {/* Stats */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '14px', marginBottom: '24px' }}>
         {[
-          { label: 'Total enfants', value: children.length, color: '#4361EE', icon: '👶' },
-          { label: 'Garçons', value: children.filter(c => c.gender === 'MALE').length, color: '#2563eb', icon: '👦' },
-          { label: 'Filles', value: children.filter(c => c.gender === 'FEMALE').length, color: '#be185d', icon: '👧' },
-          { label: 'Sans classe', value: children.filter(c => !c.classroom).length, color: '#f59e0b', icon: '⚠️' },
-          { label: 'Allergies', value: children.filter(c => c.allergies).length, color: '#ef4444', icon: '🚨' },
+          { label: tr.totalChildren, value: children.length, color: '#4361EE', icon: '👶' },
+          { label: tr.boys, value: children.filter(c => c.gender === 'MALE').length, color: '#2563eb', icon: '👦' },
+          { label: tr.girls, value: children.filter(c => c.gender === 'FEMALE').length, color: '#be185d', icon: '👧' },
+          { label: tr.noClass, value: children.filter(c => !c.classroom).length, color: '#f59e0b', icon: '⚠️' },
+          { label: tr.allergies, value: children.filter(c => c.allergies).length, color: '#ef4444', icon: '🚨' },
         ].map(s => (
           <div key={s.label} style={{ background: 'white', borderRadius: '14px', padding: '14px 16px', boxShadow: '0 2px 10px rgba(0,0,0,0.05)', display: 'flex', alignItems: 'center', gap: '10px' }}>
             <span style={{ fontSize: '24px' }}>{s.icon}</span>
@@ -208,12 +212,12 @@ export default function ChildrenClient({ children: initial, classrooms, parents 
       {/* Filters */}
       <div style={{ background: 'white', borderRadius: '16px', padding: '14px 18px', boxShadow: '0 2px 10px rgba(0,0,0,0.05)', marginBottom: '20px', display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' }}>
         <div style={{ position: 'relative', flex: 1, minWidth: '200px' }}>
-          <Search size={15} color="#94a3b8" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)' }} />
-          <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Rechercher un enfant..." style={{ ...inputStyle, paddingLeft: '36px' }} />
+          <Search size={15} color="#94a3b8" style={{ position: 'absolute', [isRTL ? 'right' : 'left']: '12px', top: '50%', transform: 'translateY(-50%)' }} />
+          <input value={search} onChange={e => setSearch(e.target.value)} placeholder={tr.search} style={{ ...inputStyle, paddingLeft: isRTL ? '14px' : '36px', paddingRight: isRTL ? '36px' : '14px' }} />
         </div>
         <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
           <button onClick={() => setClassroomFilter('')} style={{ padding: '8px 14px', borderRadius: '10px', border: 'none', cursor: 'pointer', fontSize: '13px', fontWeight: '600', background: !classroomFilter ? 'linear-gradient(135deg, #F72585, #4361EE)' : '#f1f5f9', color: !classroomFilter ? 'white' : '#64748b' }}>
-            Tous
+            {tr.all}
           </button>
           {classrooms.map(c => (
             <button key={c.id} onClick={() => setClassroomFilter(c.id)} style={{ padding: '8px 14px', borderRadius: '10px', border: 'none', cursor: 'pointer', fontSize: '13px', fontWeight: '600', background: classroomFilter === c.id ? 'linear-gradient(135deg, #F72585, #4361EE)' : '#f1f5f9', color: classroomFilter === c.id ? 'white' : '#64748b' }}>
@@ -227,11 +231,11 @@ export default function ChildrenClient({ children: initial, classrooms, parents 
       {filtered.length === 0 ? (
         <div style={{ background: 'white', borderRadius: '24px', padding: '80px 60px', textAlign: 'center', boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
           <p style={{ fontSize: '72px', margin: '0 0 16px' }}>👶</p>
-          <p style={{ fontSize: '20px', fontWeight: '700', color: '#374151', margin: '0 0 8px' }}>Aucun enfant inscrit</p>
-          <p style={{ color: '#64748b', margin: '0 0 24px', fontSize: '15px' }}>Ajoutez des enfants et liez-les à leurs parents</p>
+          <p style={{ fontSize: '20px', fontWeight: '700', color: '#374151', margin: '0 0 8px' }}>{tr.noChildren}</p>
+          <p style={{ color: '#64748b', margin: '0 0 24px', fontSize: '15px' }}>{tr.noChildrenDesc}</p>
           <button onClick={openCreate} style={{ padding: '12px 28px', background: 'linear-gradient(135deg, #F72585, #4361EE)', border: 'none', borderRadius: '12px', color: 'white', fontSize: '14px', fontWeight: '600', cursor: 'pointer' }}>
             <Plus size={16} style={{ marginRight: 6, verticalAlign: 'middle' }} />
-            Ajouter un enfant
+            {tr.addBtn}
           </button>
         </div>
       ) : (
@@ -272,21 +276,21 @@ export default function ChildrenClient({ children: initial, classrooms, parents 
               {/* Info rows */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '7px', marginBottom: '12px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 10px', background: '#f8fafc', borderRadius: '8px' }}>
-                  <span style={{ fontSize: '11px', color: '#94a3b8' }}>Classe</span>
-                  <span style={{ fontSize: '12px', fontWeight: '600', color: child.classroom ? '#059669' : '#f59e0b' }}>
-                    {child.classroom?.name ?? '⚠️ Non assigné'}
+                  <span style={{ fontSize: '11px', color: '#94a3b8' }}>{tr.class}</span>
+                  <span style={{ fontSize: '12px', fontWeight: '600', color: child.classroom ? '#059669' : '#f59e0b', textAlign: isRTL ? 'left' : 'right' }}>
+                    {child.classroom?.name ?? tr.unassigned}
                   </span>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 10px', background: '#f8fafc', borderRadius: '8px' }}>
-                  <span style={{ fontSize: '11px', color: '#94a3b8' }}>Naissance</span>
-                  <span style={{ fontSize: '12px', fontWeight: '600', color: '#374151' }}>
-                    {new Date(child.birthDate).toLocaleDateString('fr-FR')}
+                  <span style={{ fontSize: '11px', color: '#94a3b8' }}>{tr.birthDate.replace(' *', '')}</span>
+                  <span style={{ fontSize: '12px', fontWeight: '600', color: '#374151', textAlign: isRTL ? 'left' : 'right' }}>
+                    {new Date(child.birthDate).toLocaleDateString(isRTL ? 'ar-EG' : 'fr-FR')}
                   </span>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 10px', background: '#f8fafc', borderRadius: '8px' }}>
-                  <span style={{ fontSize: '11px', color: '#94a3b8' }}>Parent(s)</span>
-                  <span style={{ fontSize: '12px', fontWeight: '600', color: child.parents.length > 0 ? '#374151' : '#cbd5e1', fontStyle: child.parents.length === 0 ? 'italic' : 'normal' }}>
-                    {child.parents.length > 0 ? child.parents.map(p => p.parent.firstName).join(', ') : 'Aucun'}
+                  <span style={{ fontSize: '11px', color: '#94a3b8' }}>{tr.detailParents}</span>
+                  <span style={{ fontSize: '12px', fontWeight: '600', color: child.parents.length > 0 ? '#374151' : '#cbd5e1', fontStyle: child.parents.length === 0 ? 'italic' : 'normal', textAlign: isRTL ? 'left' : 'right' }}>
+                    {child.parents.length > 0 ? child.parents.map(p => p.parent.firstName).join(', ') : tr.none}
                   </span>
                 </div>
               </div>
@@ -296,14 +300,14 @@ export default function ChildrenClient({ children: initial, classrooms, parents 
                 <div style={{ padding: '8px 12px', background: '#fef2f2', borderRadius: '8px', marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '6px' }}>
                   <AlertTriangle size={13} color="#dc2626" />
                   <p style={{ margin: 0, fontSize: '11px', color: '#dc2626', fontWeight: '600' }}>
-                    Allergie: {child.allergies}
+                    {tr.allergyAlert} {child.allergies}
                   </p>
                 </div>
               )}
 
               {/* Action button */}
               <button onClick={() => setDetailChild(child)} style={{ width: '100%', padding: '9px', borderRadius: '10px', background: 'rgba(67,97,238,0.07)', border: '1px solid rgba(67,97,238,0.15)', cursor: 'pointer', fontSize: '13px', fontWeight: '600', color: '#4361EE', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', transition: 'opacity 0.15s' }} onMouseOver={e => (e.currentTarget.style.opacity = '0.8')} onMouseOut={e => (e.currentTarget.style.opacity = '1')}>
-                <Baby size={14} /> Voir détails
+                <Baby size={14} /> {tr.viewDetails}
               </button>
             </div>
           ))}
@@ -316,39 +320,39 @@ export default function ChildrenClient({ children: initial, classrooms, parents 
           <div style={{ background: 'white', borderRadius: '24px', padding: '36px', width: '100%', maxWidth: '560px', boxShadow: '0 32px 80px rgba(0,0,0,0.2)', maxHeight: '92vh', overflowY: 'auto' }} onClick={e => e.stopPropagation()}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '24px' }}>
               <div>
-                <h2 style={{ margin: '0 0 4px', fontSize: '20px', fontWeight: '800', color: '#0f172a' }}>{editId ? 'Modifier l\'enfant' : 'Ajouter un enfant'}</h2>
-                <p style={{ margin: 0, fontSize: '13px', color: '#94a3b8' }}>Remplissez les informations et liez aux parents</p>
+                <h2 style={{ margin: '0 0 4px', fontSize: '20px', fontWeight: '800', color: '#0f172a' }}>{editId ? tr.editChild : tr.newChild}</h2>
+                <p style={{ margin: 0, fontSize: '13px', color: '#94a3b8' }}>{tr.formDesc}</p>
               </div>
               <button onClick={() => setShowForm(false)} style={{ background: '#f1f5f9', border: 'none', borderRadius: '10px', cursor: 'pointer', padding: '8px', display: 'flex' }}>
                 <X size={20} color="#374151" />
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px', direction: isRTL ? 'rtl' : 'ltr' }}>
               {/* Name row */}
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
                 <div>
-                  <label style={{ display: 'block', fontSize: '11px', fontWeight: '700', color: '#374151', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Prénom *</label>
-                  <input type="text" value={formFirst} onChange={e => setFormFirst(e.target.value)} required placeholder="Rania" style={inputStyle} />
+                  <label style={{ display: 'block', fontSize: '11px', fontWeight: '700', color: '#374151', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{tr.firstName}</label>
+                  <input type="text" value={formFirst} onChange={e => setFormFirst(e.target.value)} required placeholder="Rania" style={{...inputStyle, textAlign: isRTL ? 'right' : 'left'}} />
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: '11px', fontWeight: '700', color: '#374151', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Nom *</label>
-                  <input type="text" value={formLast} onChange={e => setFormLast(e.target.value)} required placeholder="Bensalem" style={inputStyle} />
+                  <label style={{ display: 'block', fontSize: '11px', fontWeight: '700', color: '#374151', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{tr.lastName}</label>
+                  <input type="text" value={formLast} onChange={e => setFormLast(e.target.value)} required placeholder="Bensalem" style={{...inputStyle, textAlign: isRTL ? 'right' : 'left'}} />
                 </div>
               </div>
 
               {/* Birth + Gender */}
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
                 <div>
-                  <label style={{ display: 'block', fontSize: '11px', fontWeight: '700', color: '#374151', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Date de naissance *</label>
-                  <input type="date" value={formBirth} onChange={e => setFormBirth(e.target.value)} required style={inputStyle} />
+                  <label style={{ display: 'block', fontSize: '11px', fontWeight: '700', color: '#374151', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{tr.birthDate}</label>
+                  <input type="date" value={formBirth} onChange={e => setFormBirth(e.target.value)} required style={{...inputStyle, textAlign: isRTL ? 'right' : 'left'}} />
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: '11px', fontWeight: '700', color: '#374151', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Genre *</label>
+                  <label style={{ display: 'block', fontSize: '11px', fontWeight: '700', color: '#374151', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{tr.gender}</label>
                   <div style={{ display: 'flex', gap: '8px' }}>
                     {(['MALE', 'FEMALE'] as const).map(g => (
                       <button key={g} type="button" onClick={() => setFormGender(g)} style={{ flex: 1, padding: '11px', borderRadius: '10px', border: `1.5px solid ${formGender === g ? (g === 'MALE' ? '#2563eb' : '#be185d') : '#e2e8f0'}`, cursor: 'pointer', fontSize: '13px', fontWeight: '700', background: formGender === g ? (g === 'MALE' ? '#dbeafe' : '#fce7f3') : 'white', color: formGender === g ? (g === 'MALE' ? '#2563eb' : '#be185d') : '#94a3b8', transition: 'all 0.15s' }}>
-                        {g === 'MALE' ? '👦 Garçon' : '👧 Fille'}
+                        {g === 'MALE' ? `👦 ${tr.boy}` : `👧 ${tr.girl}`}
                       </button>
                     ))}
                   </div>
@@ -357,9 +361,9 @@ export default function ChildrenClient({ children: initial, classrooms, parents 
 
               {/* Classroom */}
               <div>
-                <label style={{ display: 'block', fontSize: '11px', fontWeight: '700', color: '#374151', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Classe</label>
-                <select value={formClassroomId} onChange={e => setFormClassroomId(e.target.value)} style={{ ...inputStyle, cursor: 'pointer' }}>
-                  <option value="">— Non assigné —</option>
+                <label style={{ display: 'block', fontSize: '11px', fontWeight: '700', color: '#374151', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{tr.class}</label>
+                <select value={formClassroomId} onChange={e => setFormClassroomId(e.target.value)} style={{ ...inputStyle, cursor: 'pointer', textAlign: isRTL ? 'right' : 'left' }}>
+                  <option value="">{tr.noClassOpt}</option>
                   {classrooms.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                 </select>
               </div>
@@ -367,11 +371,11 @@ export default function ChildrenClient({ children: initial, classrooms, parents 
               {/* Parents selection */}
               <div>
                 <label style={{ display: 'block', fontSize: '11px', fontWeight: '700', color: '#374151', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                  Lier aux parents ({formParentIds.length} sélectionné{formParentIds.length !== 1 ? 's' : ''})
+                  {tr.linkParents.replace('{count}', formParentIds.length.toString())}
                 </label>
                 {parents.length === 0 ? (
                   <div style={{ padding: '12px', background: '#fef3c7', borderRadius: '10px', fontSize: '13px', color: '#92400e' }}>
-                    ⚠️ Aucun parent disponible. Créez d'abord des comptes parents dans la page Utilisateurs.
+                    {tr.noParentsAvail}
                   </div>
                 ) : (
                   <div style={{ maxHeight: '160px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '6px', padding: '2px' }}>
@@ -390,18 +394,18 @@ export default function ChildrenClient({ children: initial, classrooms, parents 
 
               {/* Medical */}
               <div>
-                <label style={{ display: 'block', fontSize: '11px', fontWeight: '700', color: '#374151', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Allergies</label>
-                <input type="text" value={formAllergies} onChange={e => setFormAllergies(e.target.value)} placeholder="Ex: Arachides, Lactose..." style={inputStyle} />
+                <label style={{ display: 'block', fontSize: '11px', fontWeight: '700', color: '#374151', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{tr.allergies}</label>
+                <input type="text" value={formAllergies} onChange={e => setFormAllergies(e.target.value)} style={{ ...inputStyle, textAlign: isRTL ? 'right' : 'left' }} />
               </div>
               <div>
-                <label style={{ display: 'block', fontSize: '11px', fontWeight: '700', color: '#374151', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Notes médicales</label>
-                <textarea value={formMedical} onChange={e => setFormMedical(e.target.value)} placeholder="Notes importantes..." rows={2} style={{ ...inputStyle, resize: 'vertical' }} />
+                <label style={{ display: 'block', fontSize: '11px', fontWeight: '700', color: '#374151', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{tr.medicalNotes}</label>
+                <textarea value={formMedical} onChange={e => setFormMedical(e.target.value)} rows={2} style={{ ...inputStyle, resize: 'vertical', textAlign: isRTL ? 'right' : 'left' }} />
               </div>
 
               <div style={{ display: 'flex', gap: '10px', paddingTop: '4px' }}>
-                <button type="button" onClick={() => setShowForm(false)} style={{ flex: 1, padding: '12px', border: '1.5px solid #e2e8f0', borderRadius: '12px', background: 'white', fontSize: '14px', fontWeight: '600', cursor: 'pointer', color: '#374151' }}>Annuler</button>
+                <button type="button" onClick={() => setShowForm(false)} style={{ flex: 1, padding: '12px', border: '1.5px solid #e2e8f0', borderRadius: '12px', background: 'white', fontSize: '14px', fontWeight: '600', cursor: 'pointer', color: '#374151' }}>{tr.cancel}</button>
                 <button type="submit" disabled={isPending} style={{ flex: 2, padding: '12px', background: isPending ? '#9ca3af' : 'linear-gradient(135deg, #F72585, #4361EE)', border: 'none', borderRadius: '12px', color: 'white', fontSize: '14px', fontWeight: '700', cursor: isPending ? 'not-allowed' : 'pointer', boxShadow: isPending ? 'none' : '0 4px 14px rgba(247,37,133,0.3)' }}>
-                  {isPending ? 'Enregistrement...' : (editId ? '✅ Enregistrer' : '✨ Ajouter l\'enfant')}
+                  {isPending ? '...' : (editId ? `✅ ${tr.save}` : `✨ ${tr.createBtn}`)}
                 </button>
               </div>
             </form>
@@ -412,17 +416,17 @@ export default function ChildrenClient({ children: initial, classrooms, parents 
       {/* ─── Delete Modal ─── */}
       {deleteId && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.55)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px', backdropFilter: 'blur(4px)' }} onClick={() => setDeleteId(null)}>
-          <div style={{ background: 'white', borderRadius: '24px', padding: '36px', width: '100%', maxWidth: '400px', boxShadow: '0 32px 80px rgba(0,0,0,0.2)', textAlign: 'center' }} onClick={e => e.stopPropagation()}>
+          <div style={{ background: 'white', borderRadius: '24px', padding: '36px', width: '100%', maxWidth: '400px', boxShadow: '0 32px 80px rgba(0,0,0,0.2)', textAlign: 'center', direction: isRTL ? 'rtl' : 'ltr' }} onClick={e => e.stopPropagation()}>
             <div style={{ width: '64px', height: '64px', borderRadius: '50%', background: '#fee2e2', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px' }}>
               <Trash2 size={28} color="#ef4444" />
             </div>
-            <h2 style={{ margin: '0 0 8px', fontSize: '20px', fontWeight: '800', color: '#0f172a' }}>Supprimer l'enfant ?</h2>
+            <h2 style={{ margin: '0 0 8px', fontSize: '20px', fontWeight: '800', color: '#0f172a' }}>{tr.deleteTitle}</h2>
             <p style={{ margin: '0 0 6px', fontSize: '15px', color: '#374151', fontWeight: '600' }}>{deleteName}</p>
-            <p style={{ margin: '0 0 28px', fontSize: '13px', color: '#94a3b8' }}>Cette action est irréversible. Toutes les présences et liens parents seront supprimés.</p>
+            <p style={{ margin: '0 0 28px', fontSize: '13px', color: '#94a3b8' }}>{tr.deleteDesc}</p>
             <div style={{ display: 'flex', gap: '12px' }}>
-              <button onClick={() => setDeleteId(null)} style={{ flex: 1, padding: '12px', border: '1.5px solid #e2e8f0', borderRadius: '12px', background: 'white', fontSize: '14px', fontWeight: '600', cursor: 'pointer', color: '#374151' }}>Annuler</button>
+              <button onClick={() => setDeleteId(null)} style={{ flex: 1, padding: '12px', border: '1.5px solid #e2e8f0', borderRadius: '12px', background: 'white', fontSize: '14px', fontWeight: '600', cursor: 'pointer', color: '#374151' }}>{tr.cancel}</button>
               <button onClick={handleDelete} disabled={isPending} style={{ flex: 1, padding: '12px', background: isPending ? '#9ca3af' : '#ef4444', border: 'none', borderRadius: '12px', color: 'white', fontSize: '14px', fontWeight: '700', cursor: isPending ? 'not-allowed' : 'pointer' }}>
-                {isPending ? '...' : '🗑️ Supprimer'}
+                {isPending ? '...' : `🗑️ ${tr.deleteBtn}`}
               </button>
             </div>
           </div>
@@ -432,9 +436,9 @@ export default function ChildrenClient({ children: initial, classrooms, parents 
       {/* ─── Detail Modal ─── */}
       {detailChild && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.55)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px', backdropFilter: 'blur(4px)' }} onClick={() => setDetailChild(null)}>
-          <div style={{ background: 'white', borderRadius: '24px', padding: '36px', width: '100%', maxWidth: '480px', boxShadow: '0 32px 80px rgba(0,0,0,0.2)' }} onClick={e => e.stopPropagation()}>
+          <div style={{ background: 'white', borderRadius: '24px', padding: '36px', width: '100%', maxWidth: '480px', boxShadow: '0 32px 80px rgba(0,0,0,0.2)', direction: isRTL ? 'rtl' : 'ltr' }} onClick={e => e.stopPropagation()}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '24px' }}>
-              <h2 style={{ margin: 0, fontSize: '20px', fontWeight: '800', color: '#0f172a' }}>Fiche enfant</h2>
+              <h2 style={{ margin: 0, fontSize: '20px', fontWeight: '800', color: '#0f172a' }}>{tr.detailTitle}</h2>
               <button onClick={() => setDetailChild(null)} style={{ background: '#f1f5f9', border: 'none', borderRadius: '10px', cursor: 'pointer', padding: '8px', display: 'flex' }}><X size={20} color="#374151" /></button>
             </div>
 
@@ -442,28 +446,28 @@ export default function ChildrenClient({ children: initial, classrooms, parents 
               <div style={{ width: '64px', height: '64px', borderRadius: '50%', background: detailChild.gender === 'MALE' ? 'linear-gradient(135deg, #3b82f6, #1d4ed8)' : 'linear-gradient(135deg, #ec4899, #be185d)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '22px', fontWeight: '700', color: 'white', flexShrink: 0 }}>
                 {detailChild.firstName[0]}{detailChild.lastName[0]}
               </div>
-              <div>
+              <div style={{ textAlign: isRTL ? 'right' : 'left' }}>
                 <p style={{ margin: '0 0 4px', fontSize: '20px', fontWeight: '800', color: '#0f172a' }}>{detailChild.firstName} {detailChild.lastName}</p>
-                <p style={{ margin: 0, fontSize: '13px', color: '#64748b' }}>{getAge(detailChild.birthDate)} · {detailChild.gender === 'MALE' ? 'Garçon' : 'Fille'}</p>
+                <p style={{ margin: 0, fontSize: '13px', color: '#64748b' }}>{getAge(detailChild.birthDate)} · {detailChild.gender === 'MALE' ? tr.boy : tr.girl}</p>
               </div>
             </div>
 
             {[
-              { label: 'Date de naissance', value: new Date(detailChild.birthDate).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }) },
-              { label: 'Classe', value: detailChild.classroom?.name || 'Non assigné' },
-              { label: 'Allergies', value: detailChild.allergies || 'Aucune' },
-              { label: 'Notes médicales', value: detailChild.medicalNotes || 'Aucune' },
+              { label: tr.birthDate.replace(' *', ''), value: new Date(detailChild.birthDate).toLocaleDateString(isRTL ? 'ar-EG' : 'fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }) },
+              { label: tr.detailClass, value: detailChild.classroom?.name || tr.noClassOpt },
+              { label: tr.detailAllergies, value: detailChild.allergies || tr.none },
+              { label: tr.detailMedical, value: detailChild.medicalNotes || tr.none },
             ].map(row => (
               <div key={row.label} style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 0', borderBottom: '1px solid #f1f5f9' }}>
                 <span style={{ fontSize: '13px', color: '#94a3b8' }}>{row.label}</span>
-                <span style={{ fontSize: '13px', fontWeight: '600', color: '#374151', maxWidth: '60%', textAlign: 'right' }}>{row.value}</span>
+                <span style={{ fontSize: '13px', fontWeight: '600', color: '#374151', maxWidth: '60%', textAlign: isRTL ? 'left' : 'right' }}>{row.value}</span>
               </div>
             ))}
 
-            <div style={{ marginTop: '16px' }}>
-              <p style={{ fontSize: '12px', fontWeight: '700', color: '#374151', margin: '0 0 10px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Parent(s)</p>
+            <div style={{ marginTop: '16px', textAlign: isRTL ? 'right' : 'left' }}>
+              <p style={{ fontSize: '12px', fontWeight: '700', color: '#374151', margin: '0 0 10px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{tr.detailParents}</p>
               {detailChild.parents.length === 0
-                ? <p style={{ fontSize: '13px', color: '#94a3b8', fontStyle: 'italic' }}>Aucun parent lié</p>
+                ? <p style={{ fontSize: '13px', color: '#94a3b8', fontStyle: 'italic' }}>{tr.noParentsLinked}</p>
                 : detailChild.parents.map(p => (
                   <div key={p.parent.id} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 12px', background: '#f8fafc', borderRadius: '10px', marginBottom: '6px' }}>
                     <div style={{ width: '34px', height: '34px', borderRadius: '50%', background: 'linear-gradient(135deg, #F72585, #4361EE)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', fontWeight: '700', color: 'white', flexShrink: 0 }}>
@@ -478,9 +482,9 @@ export default function ChildrenClient({ children: initial, classrooms, parents 
               }
             </div>
 
-            <button onClick={() => { setDetailChild(null); openEdit(detailChild) }} style={{ width: '100%', marginTop: '20px', padding: '12px', background: 'linear-gradient(135deg, #F72585, #4361EE)', border: 'none', borderRadius: '12px', color: 'white', fontSize: '14px', fontWeight: '700', cursor: 'pointer' }}>
-              <Edit2 size={14} style={{ marginRight: 6, verticalAlign: 'middle' }} />
-              Modifier la fiche
+            <button onClick={() => { setDetailChild(null); openEdit(detailChild) }} style={{ width: '100%', marginTop: '20px', padding: '12px', background: 'linear-gradient(135deg, #F72585, #4361EE)', border: 'none', borderRadius: '12px', color: 'white', fontSize: '14px', fontWeight: '700', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
+              <Edit2 size={14} />
+              {tr.editProfile}
             </button>
           </div>
         </div>
