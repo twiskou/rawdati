@@ -35,7 +35,6 @@ export default function TeacherAnnouncementsClient({ announcements, kindergarten
   const [isPending, startTransition] = useTransition()
   const { t, isRTL } = useLanguage()
   const tr = t.teacher.announcements
-  const trForm = t.teacher.activities.form // Reuse from activities where applicable, or inline
 
   const typeLabels: Record<string, string> = {
     MEETING: isRTL ? 'اجتماع' : 'Réunion',

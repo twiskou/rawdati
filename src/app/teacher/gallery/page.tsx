@@ -1,11 +1,15 @@
 import { redirect } from 'next/navigation'
 import { getSession } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { getServerLanguage } from '@/lib/i18n/server'
 import TeacherGalleryClient from './TeacherGalleryClient'
 
 export default async function TeacherGalleryPage() {
   const session = await getSession()
   if (!session || !['TEACHER', 'ADMIN', 'SUPER_ADMIN'].includes(session.role)) redirect('/login')
+
+  const { t, isRTL } = await getServerLanguage()
+  const tr = t.teacher.gallery
 
   const classrooms = await prisma.classroom.findMany({
     where: session.role === 'TEACHER' ? { teacherId: session.id } : { kindergartenId: session.kindergartenId },
@@ -33,14 +37,37 @@ export default async function TeacherGalleryPage() {
     .sort((a, b) => new Date(b.activityDate).getTime() - new Date(a.activityDate).getTime())
 
   return (
-    <div style={{ fontFamily: "'Inter', 'Segoe UI', sans-serif", maxWidth: '1100px' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '28px', flexWrap: 'wrap', gap: '16px' }}>
+    <div
+      style={{
+        fontFamily: "'Inter', 'Segoe UI', sans-serif",
+        maxWidth: '1100px',
+        direction: isRTL ? 'rtl' : 'ltr',
+      }}
+    >
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'flex-start',
+          marginBottom: '28px',
+          flexWrap: 'wrap',
+          gap: '16px',
+        }}
+      >
         <div>
-          <h1 style={{ fontSize: '28px', fontWeight: '800', color: '#0f172a', margin: '0 0 6px', letterSpacing: '-0.5px' }}>
-            Galerie
+          <h1
+            style={{
+              fontSize: '28px',
+              fontWeight: '800',
+              color: '#0f172a',
+              margin: '0 0 6px',
+              letterSpacing: '-0.5px',
+            }}
+          >
+            {tr.title}
           </h1>
           <p style={{ fontSize: '15px', color: '#64748b', margin: 0 }}>
-            {allMedia.length} photo(s) publiées dans vos classes
+            {allMedia.length} {isRTL ? 'صورة في قسمك' : 'photo(s) publiées dans vos classes'}
           </p>
         </div>
       </div>

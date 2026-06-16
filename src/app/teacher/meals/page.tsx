@@ -1,11 +1,15 @@
 import { redirect } from 'next/navigation'
 import { getSession } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { getServerLanguage } from '@/lib/i18n/server'
 import TeacherMealsClient from './TeacherMealsClient'
 
 export default async function TeacherMealsPage() {
   const session = await getSession()
   if (!session || session.role !== 'TEACHER') redirect('/login')
+
+  const { t, isRTL } = await getServerLanguage()
+  const tr = t.teacher.meals
 
   const classroom = await prisma.classroom.findFirst({
     where: { teacherId: session.id },
@@ -32,18 +36,40 @@ export default async function TeacherMealsPage() {
     : null
 
   return (
-    <div style={{ fontFamily: "'Inter', 'Segoe UI', sans-serif", maxWidth: '700px' }}>
+    <div
+      style={{
+        fontFamily: "'Inter', 'Segoe UI', sans-serif",
+        maxWidth: '700px',
+        direction: isRTL ? 'rtl' : 'ltr',
+      }}
+    >
       <div style={{ marginBottom: '28px' }}>
-        <h1 style={{ fontSize: '28px', fontWeight: '800', color: '#0f172a', margin: '0 0 6px', letterSpacing: '-0.5px' }}>
-          Repas
+        <h1
+          style={{
+            fontSize: '28px',
+            fontWeight: '800',
+            color: '#0f172a',
+            margin: '0 0 6px',
+            letterSpacing: '-0.5px',
+          }}
+        >
+          {tr.title}
         </h1>
         <p style={{ fontSize: '15px', color: '#64748b', margin: 0 }}>
-          Publiez le menu du jour
+          {tr.subtitle}
         </p>
       </div>
       <TeacherMealsClient
         kindergartenId={kindergartenId}
-        existingMeal={existingMeal ? { breakfast: existingMeal.breakfast, lunch: existingMeal.lunch, snack: existingMeal.snack } : null}
+        existingMeal={
+          existingMeal
+            ? {
+                breakfast: existingMeal.breakfast,
+                lunch: existingMeal.lunch,
+                snack: existingMeal.snack,
+              }
+            : null
+        }
         todayStr={todayStr}
       />
     </div>
