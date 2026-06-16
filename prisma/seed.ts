@@ -13,10 +13,10 @@ const libsql = createClient({
 
 async function main() {
   const hashedPassword = await bcrypt.hash('admin1234', 10)
-  
+
   const id = 'cuid_' + Math.random().toString(36).substring(2, 15)
   const now = new Date().toISOString()
-  
+
   // Upsert equivalent
   await libsql.execute({
     sql: `DELETE FROM User WHERE email = ?`,
