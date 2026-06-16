@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { Users, CheckCircle, Calendar, Image, ClipboardList, Utensils, Bell, Star, ChevronRight } from 'lucide-react'
+import { useLanguage } from '@/lib/i18n/LanguageContext'
 
 interface ChildWithAttendance {
   id: string
@@ -37,18 +38,21 @@ export default function TeacherDashboardClient({
   firstName, classNames, stats, childrenList, activitiesList
 }: TeacherDashboardClientProps) {
 
+  const { t, isRTL } = useLanguage()
+  const tr = t.teacher.dashboard
+
   const quickLinks = [
-    { href: '/teacher/attendance', icon: ClipboardList, label: 'Présences', color: '#10b981', bg: 'linear-gradient(135deg, #10b981, #059669)', shadow: 'rgba(16,185,129,0.4)' },
-    { href: '/teacher/activities', icon: Calendar, label: 'Activités', color: '#4361EE', bg: 'linear-gradient(135deg, #4361EE, #3b82f6)', shadow: 'rgba(67,97,238,0.4)' },
-    { href: '/teacher/meals', icon: Utensils, label: 'Repas', color: '#f59e0b', bg: 'linear-gradient(135deg, #f59e0b, #d97706)', shadow: 'rgba(245,158,11,0.4)' },
-    { href: '/teacher/announcements', icon: Bell, label: 'Annonces', color: '#F72585', bg: 'linear-gradient(135deg, #F72585, #e11d48)', shadow: 'rgba(247,37,133,0.4)' },
+    { href: '/teacher/attendance', icon: ClipboardList, label: tr.quickLinks.attendance, color: '#10b981', bg: 'linear-gradient(135deg, #10b981, #059669)', shadow: 'rgba(16,185,129,0.4)' },
+    { href: '/teacher/activities', icon: Calendar, label: tr.quickLinks.activities, color: '#4361EE', bg: 'linear-gradient(135deg, #4361EE, #3b82f6)', shadow: 'rgba(67,97,238,0.4)' },
+    { href: '/teacher/meals', icon: Utensils, label: tr.quickLinks.meals, color: '#f59e0b', bg: 'linear-gradient(135deg, #f59e0b, #d97706)', shadow: 'rgba(245,158,11,0.4)' },
+    { href: '/teacher/announcements', icon: Bell, label: tr.quickLinks.announcements, color: '#F72585', bg: 'linear-gradient(135deg, #F72585, #e11d48)', shadow: 'rgba(247,37,133,0.4)' },
   ]
 
   const statCards = [
-    { label: 'Élèves total', value: stats.totalChildren, icon: Users, color: '#4361EE', bg: 'rgba(67,97,238,0.08)' },
-    { label: "Présents aujourd'hui", value: stats.presentToday, icon: CheckCircle, color: '#10b981', bg: 'rgba(16,185,129,0.08)' },
-    { label: 'Activités publiées', value: stats.totalActivities, icon: Star, color: '#F72585', bg: 'rgba(247,37,133,0.08)' },
-    { label: 'Photos partagées', value: stats.totalPhotos, icon: Image, color: '#f59e0b', bg: 'rgba(245,158,11,0.08)' },
+    { label: tr.stats.totalStudents, value: stats.totalChildren, icon: Users, color: '#4361EE', bg: 'rgba(67,97,238,0.08)' },
+    { label: tr.stats.presentToday, value: stats.presentToday, icon: CheckCircle, color: '#10b981', bg: 'rgba(16,185,129,0.08)' },
+    { label: tr.stats.activitiesPublished, value: stats.totalActivities, icon: Star, color: '#F72585', bg: 'rgba(247,37,133,0.08)' },
+    { label: tr.stats.photosShared, value: stats.totalPhotos, icon: Image, color: '#f59e0b', bg: 'rgba(245,158,11,0.08)' },
   ]
 
   return (
@@ -68,18 +72,18 @@ export default function TeacherDashboardClient({
         <div style={{ position: 'relative', zIndex: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '20px' }}>
           <div>
             <h1 style={{ fontSize: '32px', fontWeight: '800', margin: '0 0 8px', letterSpacing: '-0.5px' }}>
-              Bonjour, {firstName} 👋
+              {tr.greeting.replace('{name}', firstName)}
             </h1>
             <p style={{ fontSize: '16px', color: '#cbd5e1', margin: 0, fontWeight: '500' }}>
-              {classNames ? `En charge de : ${classNames}` : 'Aucune classe assignée pour le moment'}
+              {classNames ? tr.inChargeOf.replace('{classes}', classNames) : tr.noClass}
             </p>
           </div>
           
           <div style={{ display: 'flex', gap: '12px' }}>
             <div style={{ background: 'rgba(255,255,255,0.1)', backdropFilter: 'blur(10px)', padding: '12px 20px', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.1)' }}>
-              <p style={{ margin: 0, fontSize: '12px', color: '#cbd5e1', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Aujourd'hui</p>
+              <p style={{ margin: 0, fontSize: '12px', color: '#cbd5e1', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{tr.today}</p>
               <p style={{ margin: '4px 0 0', fontSize: '16px', fontWeight: '700' }}>
-                {new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })}
+                {new Date().toLocaleDateString(isRTL ? 'ar-EG' : 'fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })}
               </p>
             </div>
           </div>
@@ -120,18 +124,18 @@ export default function TeacherDashboardClient({
           
           <div style={{ background: 'white', borderRadius: '24px', padding: '28px', boxShadow: '0 4px 20px rgba(0,0,0,0.04)', border: '1px solid rgba(0,0,0,0.02)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-              <h2 style={{ margin: 0, fontSize: '18px', fontWeight: '800', color: '#0f172a' }}>Présences du jour</h2>
+              <h2 style={{ margin: 0, fontSize: '18px', fontWeight: '800', color: '#0f172a' }}>{tr.attendance.title}</h2>
               <Link href="/teacher/attendance" className="hover-link" style={{ fontSize: '14px', color: '#4361EE', textDecoration: 'none', fontWeight: '700', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                Faire l'appel <ChevronRight size={16} />
+                {tr.attendance.takeAttendance} {isRTL ? '' : <ChevronRight size={16} />}
               </Link>
             </div>
 
             {/* Attendance Progress Bar */}
             <div style={{ marginBottom: '28px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px', fontSize: '14px', fontWeight: '600' }}>
-                <span style={{ color: '#10b981' }}>{stats.presentToday} Présents</span>
-                <span style={{ color: '#f59e0b' }}>{stats.notMarked} À pointer</span>
-                <span style={{ color: '#ef4444' }}>{stats.absentToday} Absents</span>
+                <span style={{ color: '#10b981' }}>{stats.presentToday} {tr.attendance.present}</span>
+                <span style={{ color: '#f59e0b' }}>{stats.notMarked} {tr.attendance.toMark}</span>
+                <span style={{ color: '#ef4444' }}>{stats.absentToday} {tr.attendance.absent}</span>
               </div>
               <div style={{ display: 'flex', height: '12px', borderRadius: '999px', overflow: 'hidden', background: '#f1f5f9' }}>
                 {stats.totalChildren > 0 && (
@@ -148,18 +152,18 @@ export default function TeacherDashboardClient({
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
               {childrenList.length === 0 ? (
                  <div style={{ textAlign: 'center', padding: '20px', background: '#f8fafc', borderRadius: '16px' }}>
-                   <p style={{ margin: 0, color: '#94a3b8', fontSize: '14px', fontWeight: '500' }}>Aucun élève trouvé</p>
+                   <p style={{ margin: 0, color: '#94a3b8', fontSize: '14px', fontWeight: '500' }}>{tr.attendance.noStudents}</p>
                  </div>
               ) : (
                 childrenList.map((child) => {
                   const att = child.attendances[0]
                   const statusInfo = att
                     ? att.status === 'PRESENT'
-                      ? { label: 'Présent', bg: '#d1fae5', color: '#059669', dot: '#10b981' }
+                      ? { label: tr.attendance.statusPresent, bg: '#d1fae5', color: '#059669', dot: '#10b981' }
                       : att.status === 'ABSENT'
-                      ? { label: 'Absent', bg: '#fee2e2', color: '#dc2626', dot: '#ef4444' }
-                      : { label: 'Retard', bg: '#fef3c7', color: '#d97706', dot: '#f59e0b' }
-                    : { label: 'Non marqué', bg: '#f8fafc', color: '#94a3b8', dot: '#cbd5e1' }
+                      ? { label: tr.attendance.statusAbsent, bg: '#fee2e2', color: '#dc2626', dot: '#ef4444' }
+                      : { label: tr.attendance.statusLate, bg: '#fef3c7', color: '#d97706', dot: '#f59e0b' }
+                    : { label: tr.attendance.statusNotMarked, bg: '#f8fafc', color: '#94a3b8', dot: '#cbd5e1' }
 
                   return (
                     <div
@@ -240,14 +244,14 @@ export default function TeacherDashboardClient({
           <div style={{ background: 'white', borderRadius: '24px', padding: '28px', boxShadow: '0 4px 20px rgba(0,0,0,0.04)', border: '1px solid rgba(0,0,0,0.02)', flex: 1 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
               <h3 style={{ margin: 0, fontSize: '18px', fontWeight: '800', color: '#0f172a' }}>
-                Activités récentes
+                {tr.activities.title}
               </h3>
             </div>
             
             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               {activitiesList.length === 0 ? (
                 <div style={{ textAlign: 'center', padding: '20px', background: '#f8fafc', borderRadius: '16px' }}>
-                  <p style={{ margin: 0, color: '#94a3b8', fontSize: '14px', fontWeight: '500' }}>Aucune activité publiée</p>
+                  <p style={{ margin: 0, color: '#94a3b8', fontSize: '14px', fontWeight: '500' }}>{tr.activities.noActivities}</p>
                 </div>
               ) : (
                 activitiesList.map((act) => (
@@ -256,16 +260,16 @@ export default function TeacherDashboardClient({
                     className="hover-card"
                     style={{
                       padding: '16px', background: '#f8fafc', borderRadius: '16px',
-                      borderLeft: '4px solid #4361EE', transition: 'all 0.2s', cursor: 'default'
+                      [isRTL ? 'borderRight' : 'borderLeft']: '4px solid #4361EE', transition: 'all 0.2s', cursor: 'default'
                     }}
                   >
                     <p style={{ margin: '0 0 6px', fontSize: '15px', fontWeight: '700', color: '#1e293b' }}>{act.title}</p>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                       <span style={{ fontSize: '12px', color: '#64748b', fontWeight: '500', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                        <Calendar size={14} /> {new Date(act.activityDate).toLocaleDateString('fr-FR')}
+                        <Calendar size={14} /> {new Date(act.activityDate).toLocaleDateString(isRTL ? 'ar-EG' : 'fr-FR')}
                       </span>
                       <span style={{ fontSize: '12px', color: '#F72585', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                        <Image size={14} /> {act.media.length} photo(s)
+                        <Image size={14} /> {tr.activities.photos.replace('{count}', act.media.length.toString())}
                       </span>
                     </div>
                   </div>

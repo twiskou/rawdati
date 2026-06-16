@@ -3,6 +3,7 @@
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { Save, Edit2, CheckCircle, AlertTriangle, X } from 'lucide-react'
+import { useLanguage } from '@/lib/i18n/LanguageContext'
 
 interface TeacherMealsClientProps {
   kindergartenId: string | null
@@ -22,6 +23,8 @@ export default function TeacherMealsClient({ kindergartenId, existingMeal: initi
   const [showConfirm, setShowConfirm] = useState(false)
   const [msg, setMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
   const [isPending, startTransition] = useTransition()
+  const { t, isRTL } = useLanguage()
+  const tr = t.teacher.meals
 
   const inputStyle: React.CSSProperties = {
     width: '100%',
@@ -36,6 +39,7 @@ export default function TeacherMealsClient({ kindergartenId, existingMeal: initi
     minHeight: '80px',
     boxSizing: 'border-box',
     fontFamily: 'inherit',
+    textAlign: isRTL ? 'right' : 'left',
   }
 
   function handleSaveClick(e: React.FormEvent) {
@@ -55,21 +59,21 @@ export default function TeacherMealsClient({ kindergartenId, existingMeal: initi
         body: JSON.stringify({ kindergartenId, breakfast, lunch, snack, date: todayStr }),
       })
       if (res.ok) {
-        setMsg({ type: 'success', text: 'Repas publié avec succès !' })
+        setMsg({ type: 'success', text: tr.successPublish })
         setExistingMeal({ breakfast, lunch, snack })
         setIsEditing(false)
         router.refresh()
       } else {
-        setMsg({ type: 'error', text: 'Erreur lors de la publication' })
+        setMsg({ type: 'error', text: tr.errorPublish })
       }
       setTimeout(() => setMsg(null), 3000)
     })
   }
 
   const meals = [
-    { key: 'breakfast', label: 'Petit-déjeuner', emoji: '🥐', value: breakfast, setter: setBreakfast },
-    { key: 'lunch', label: 'Déjeuner', emoji: '🍽️', value: lunch, setter: setLunch },
-    { key: 'snack', label: 'Goûter', emoji: '🍎', value: snack, setter: setSnack },
+    { key: 'breakfast', label: tr.breakfast, emoji: '🥐', value: breakfast, setter: setBreakfast },
+    { key: 'lunch', label: tr.lunch, emoji: '🍽️', value: lunch, setter: setLunch },
+    { key: 'snack', label: tr.snack, emoji: '🍎', value: snack, setter: setSnack },
   ]
 
   return (
@@ -83,10 +87,10 @@ export default function TeacherMealsClient({ kindergartenId, existingMeal: initi
         }}
       >
         <p style={{ margin: '0 0 4px', fontSize: '13px', opacity: 0.8, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-          Menu du
+          {tr.menuOf}
         </p>
         <p style={{ margin: 0, fontSize: '22px', fontWeight: '700' }}>
-          {new Date(todayStr).toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+          {new Date(todayStr).toLocaleDateString(isRTL ? 'ar-EG' : 'fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
         </p>
         {existingMeal && !isEditing && (
           <span
@@ -96,7 +100,7 @@ export default function TeacherMealsClient({ kindergartenId, existingMeal: initi
               background: 'rgba(255,255,255,0.2)', fontSize: '13px', fontWeight: '600',
             }}
           >
-            <CheckCircle size={16} /> Menu publié
+            <CheckCircle size={16} /> {tr.menuPublished}
           </span>
         )}
       </div>
@@ -138,23 +142,23 @@ export default function TeacherMealsClient({ kindergartenId, existingMeal: initi
               <Save size={28} color="#4361EE" />
             </div>
             <h2 style={{ margin: '0 0 12px', fontSize: '20px', fontWeight: '800', color: '#0f172a' }}>
-              Confirmer la publication
+              {tr.confirmPublish}
             </h2>
             <p style={{ margin: '0 0 28px', fontSize: '15px', color: '#64748b', lineHeight: '1.5' }}>
-              Êtes-vous sûr de vouloir publier ce menu pour aujourd'hui ? Tous les parents pourront le consulter.
+              {tr.confirmPublishDesc}
             </p>
             <div style={{ display: 'flex', gap: '12px' }}>
               <button 
                 onClick={() => setShowConfirm(false)} 
                 style={{ flex: 1, padding: '13px', border: '1.5px solid #e2e8f0', borderRadius: '12px', background: 'white', fontSize: '14px', fontWeight: '600', cursor: 'pointer', color: '#374151' }}
               >
-                Annuler
+                {tr.cancel}
               </button>
               <button 
                 onClick={handleConfirmSubmit} 
                 style={{ flex: 1, padding: '13px', background: 'linear-gradient(135deg, #F72585, #4361EE)', border: 'none', borderRadius: '12px', color: 'white', fontSize: '14px', fontWeight: '700', cursor: 'pointer' }}
               >
-                Oui, publier
+                {tr.publish}
               </button>
             </div>
           </div>
@@ -164,13 +168,13 @@ export default function TeacherMealsClient({ kindergartenId, existingMeal: initi
       {/* Content */}
       {!kindergartenId ? (
         <div style={{ background: 'white', borderRadius: '20px', padding: '40px', textAlign: 'center', boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
-          <p style={{ fontSize: '14px', color: '#64748b' }}>Aucune crèche associée.</p>
+          <p style={{ fontSize: '14px', color: '#64748b' }}>{tr.noKindergarten}</p>
         </div>
       ) : !isEditing && existingMeal ? (
         // VIEW MODE
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-            <h2 style={{ fontSize: '18px', fontWeight: '800', color: '#0f172a', margin: 0 }}>Menu du jour</h2>
+            <h2 style={{ fontSize: '18px', fontWeight: '800', color: '#0f172a', margin: 0 }}>{tr.todayMenu}</h2>
             <button
               onClick={() => setIsEditing(true)}
               style={{
@@ -183,7 +187,7 @@ export default function TeacherMealsClient({ kindergartenId, existingMeal: initi
               onMouseOver={(e) => e.currentTarget.style.background = '#e2e8f0'}
               onMouseOut={(e) => e.currentTarget.style.background = '#f1f5f9'}
             >
-              <Edit2 size={14} /> Modifier
+              <Edit2 size={14} /> {tr.edit}
             </button>
           </div>
           
@@ -197,7 +201,7 @@ export default function TeacherMealsClient({ kindergartenId, existingMeal: initi
                   <div>
                     <h3 style={{ margin: '0 0 6px', fontSize: '15px', fontWeight: '700', color: '#0f172a' }}>{m.label}</h3>
                     <p style={{ margin: 0, fontSize: '14px', color: m.value ? '#374151' : '#94a3b8', lineHeight: '1.5' }}>
-                      {m.value || 'Non renseigné'}
+                      {m.value || tr.notProvided}
                     </p>
                   </div>
                 </div>
@@ -210,7 +214,7 @@ export default function TeacherMealsClient({ kindergartenId, existingMeal: initi
         <form onSubmit={handleSaveClick}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
             <h2 style={{ fontSize: '18px', fontWeight: '800', color: '#0f172a', margin: 0 }}>
-              {existingMeal ? 'Modifier le menu' : 'Remplir le menu'}
+              {existingMeal ? tr.editMenu : tr.fillMenu}
             </h2>
             {existingMeal && (
               <button
@@ -227,7 +231,7 @@ export default function TeacherMealsClient({ kindergartenId, existingMeal: initi
                   cursor: 'pointer', fontSize: '13px', fontWeight: '600', color: '#64748b'
                 }}
               >
-                <X size={14} /> Annuler
+                <X size={14} /> {tr.cancel}
               </button>
             )}
           </div>
@@ -248,14 +252,14 @@ export default function TeacherMealsClient({ kindergartenId, existingMeal: initi
                       {m.label}
                     </label>
                     <p style={{ margin: 0, fontSize: '12px', color: '#94a3b8' }}>
-                      Décrivez le plat proposé
+                      {tr.describeDish}
                     </p>
                   </div>
                 </div>
                 <textarea
                   value={m.value}
                   onChange={(e) => m.setter(e.target.value)}
-                  placeholder={`Ex: ${m.key === 'breakfast' ? 'Lait chaud, pain beurre, jus d\'orange' : m.key === 'lunch' ? 'Soupe de légumes, poulet rôti, salade' : 'Yaourt, fruits frais'}`}
+                  placeholder={isRTL ? `وصف ${m.label}...` : `Ex: ${m.key === 'breakfast' ? 'Lait chaud, pain beurre, jus d\'orange' : m.key === 'lunch' ? 'Soupe de légumes, poulet rôti, salade' : 'Yaourt, fruits frais'}`}
                   style={inputStyle}
                 />
               </div>
@@ -275,7 +279,7 @@ export default function TeacherMealsClient({ kindergartenId, existingMeal: initi
             }}
           >
             <Save size={18} />
-            {isPending ? 'En cours...' : existingMeal ? 'Mettre à jour le menu' : 'Publier le menu'}
+            {isPending ? tr.saving : existingMeal ? tr.updateMenu : tr.publishMenu}
           </button>
         </form>
       )}

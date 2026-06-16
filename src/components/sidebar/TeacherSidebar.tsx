@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { logoutAction } from '@/actions/auth'
+import { useLanguage } from '@/lib/i18n/LanguageContext'
 import {
   LayoutDashboard,
   Calendar,
@@ -23,18 +24,20 @@ interface TeacherSidebarProps {
   avatar?: string | null
 }
 
-const navItems = [
-  { href: '/teacher/dashboard', icon: LayoutDashboard, label: 'Tableau de bord' },
-  { href: '/teacher/activities', icon: Calendar, label: 'Activités' },
-  { href: '/teacher/attendance', icon: ClipboardList, label: 'Présences' },
-  { href: '/teacher/meals', icon: Utensils, label: 'Repas' },
-  { href: '/teacher/gallery', icon: Image, label: 'Galerie' },
-  { href: '/teacher/announcements', icon: Bell, label: 'Annonces' },
-]
-
 export default function TeacherSidebar({ firstName, lastName, avatar }: TeacherSidebarProps) {
   const pathname = usePathname()
   const [mobileOpen, setMobileOpen] = useState(false)
+  const { t, isRTL } = useLanguage()
+  const tr = t.teacher.sidebar
+
+  const navItems = [
+    { href: '/teacher/dashboard', icon: LayoutDashboard, label: tr.dashboard },
+    { href: '/teacher/activities', icon: Calendar, label: tr.activities },
+    { href: '/teacher/attendance', icon: ClipboardList, label: tr.attendance },
+    { href: '/teacher/meals', icon: Utensils, label: tr.meals },
+    { href: '/teacher/gallery', icon: Image, label: tr.gallery },
+    { href: '/teacher/announcements', icon: Bell, label: tr.announcements },
+  ]
 
   const SidebarContent = () => (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', padding: '24px 16px' }}>
@@ -69,7 +72,7 @@ export default function TeacherSidebar({ firstName, lastName, avatar }: TeacherS
           <p style={{ margin: 0, fontSize: '13px', fontWeight: '600', color: '#1e293b', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
             {firstName} {lastName}
           </p>
-          <p style={{ margin: 0, fontSize: '11px', color: '#64748b' }}>Éducatrice</p>
+          <p style={{ margin: 0, fontSize: '11px', color: '#64748b' }}>{tr.role}</p>
         </div>
       </div>
 
@@ -90,7 +93,8 @@ export default function TeacherSidebar({ firstName, lastName, avatar }: TeacherS
                 color: isActive ? '#4361EE' : '#64748b',
                 fontWeight: isActive ? '600' : '500', fontSize: '14px',
                 transition: 'all 0.15s ease',
-                borderLeft: isActive ? '3px solid #4361EE' : '3px solid transparent',
+                borderLeft: isActive && !isRTL ? '3px solid #4361EE' : '3px solid transparent',
+                borderRight: isActive && isRTL ? '3px solid #4361EE' : '3px solid transparent',
               }}
             >
               <Icon size={18} />
@@ -111,7 +115,7 @@ export default function TeacherSidebar({ firstName, lastName, avatar }: TeacherS
           }}
         >
           <LogOut size={18} />
-          Déconnexion
+          {tr.logout}
         </button>
       </form>
     </div>
@@ -122,8 +126,10 @@ export default function TeacherSidebar({ firstName, lastName, avatar }: TeacherS
       <aside
         style={{
           width: '260px', minHeight: '100vh', background: 'white',
-          borderRight: '1px solid #f1f5f9', position: 'fixed',
-          top: 0, left: 0, bottom: 0, zIndex: 40, overflowY: 'auto',
+          borderRight: isRTL ? 'none' : '1px solid #f1f5f9',
+          borderLeft: isRTL ? '1px solid #f1f5f9' : 'none',
+          position: 'fixed',
+          top: 0, [isRTL ? 'right' : 'left']: 0, bottom: 0, zIndex: 40, overflowY: 'auto',
         }}
         className="hidden-mobile-sidebar"
       >
@@ -159,13 +165,13 @@ export default function TeacherSidebar({ firstName, lastName, avatar }: TeacherS
 
       <div
         style={{
-          position: 'fixed', top: 0, left: 0, bottom: 0, width: '280px',
+          position: 'fixed', top: 0, [isRTL ? 'right' : 'left']: 0, bottom: 0, width: '280px',
           background: 'white', zIndex: 70,
-          transform: mobileOpen ? 'translateX(0)' : 'translateX(-100%)',
+          transform: mobileOpen ? 'translateX(0)' : `translateX(${isRTL ? '100%' : '-100%'})`,
           transition: 'transform 0.3s ease', overflowY: 'auto',
         }}
       >
-        <div style={{ position: 'absolute', top: '16px', right: '16px' }}>
+        <div style={{ position: 'absolute', top: '16px', [isRTL ? 'left' : 'right']: '16px' }}>
           <button
             onClick={() => setMobileOpen(false)}
             style={{ background: '#f1f5f9', border: 'none', borderRadius: '8px', cursor: 'pointer', padding: '6px', display: 'flex' }}

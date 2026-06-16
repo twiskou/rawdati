@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Image as ImageIcon, Trash2, Calendar, MapPin, Plus, Maximize2, X } from 'lucide-react'
+import { useLanguage } from '@/lib/i18n/LanguageContext'
 
 interface MediaItem {
   id: string
@@ -17,6 +18,8 @@ export default function TeacherGalleryClient({ initialMedia }: { initialMedia: M
   const router = useRouter()
   const [mediaList, setMediaList] = useState<MediaItem[]>(initialMedia)
   const [selectedPhoto, setSelectedPhoto] = useState<MediaItem | null>(null)
+  const { t, isRTL } = useLanguage()
+  const tr = t.teacher.gallery
 
   // Quick navigation to activities to upload new photos
   const handleAddPhotos = () => {
@@ -39,7 +42,7 @@ export default function TeacherGalleryClient({ initialMedia }: { initialMedia: M
           onMouseOver={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
           onMouseOut={(e) => e.currentTarget.style.transform = 'translateY(0)'}
         >
-          <Plus size={18} /> Associer des photos à une activité
+          <Plus size={18} /> {tr.associatePhotos}
         </button>
       </div>
 
@@ -55,9 +58,9 @@ export default function TeacherGalleryClient({ initialMedia }: { initialMedia: M
           <div style={{ width: '80px', height: '80px', borderRadius: '50%', background: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px' }}>
             <ImageIcon size={40} color="#94a3b8" />
           </div>
-          <p style={{ fontSize: '20px', fontWeight: '800', color: '#0f172a', margin: '0 0 8px' }}>Aucune photo</p>
+          <p style={{ fontSize: '20px', fontWeight: '800', color: '#0f172a', margin: '0 0 8px' }}>{tr.noPhotos}</p>
           <p style={{ color: '#64748b', margin: 0, fontSize: '15px' }}>
-            Les photos que vous ajoutez à vos activités apparaîtront ici.
+            {tr.noPhotosDesc}
           </p>
           <button
             onClick={handleAddPhotos}
@@ -67,7 +70,7 @@ export default function TeacherGalleryClient({ initialMedia }: { initialMedia: M
               fontSize: '14px', fontWeight: '600', cursor: 'pointer'
             }}
           >
-            Créer une activité
+            {tr.createActivity}
           </button>
         </div>
       ) : (
@@ -98,7 +101,7 @@ export default function TeacherGalleryClient({ initialMedia }: { initialMedia: M
               />
               <div
                 style={{
-                  position: 'absolute', top: '12px', right: '12px',
+                  position: 'absolute', top: '12px', [isRTL ? 'left' : 'right']: '12px',
                   background: 'rgba(255,255,255,0.2)', backdropFilter: 'blur(4px)',
                   borderRadius: '50%', padding: '6px', color: 'white',
                   opacity: 0, transform: 'scale(0.8)', transition: 'all 0.2s ease'
@@ -118,7 +121,7 @@ export default function TeacherGalleryClient({ initialMedia }: { initialMedia: M
                 </p>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <span style={{ fontSize: '11px', color: '#cbd5e1', fontWeight: '500', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                    <Calendar size={12} /> {new Date(item.activityDate).toLocaleDateString('fr-FR')}
+                    <Calendar size={12} /> {new Date(item.activityDate).toLocaleDateString(isRTL ? 'ar-EG' : 'fr-FR')}
                   </span>
                   <span style={{ fontSize: '10px', color: '#cbd5e1', background: 'rgba(255,255,255,0.15)', padding: '2px 6px', borderRadius: '4px', fontWeight: '600' }}>
                     {item.className}
@@ -144,7 +147,7 @@ export default function TeacherGalleryClient({ initialMedia }: { initialMedia: M
             <div style={{ color: 'white' }}>
               <h3 style={{ margin: '0 0 4px', fontSize: '20px', fontWeight: '700' }}>{selectedPhoto.activityTitle}</h3>
               <div style={{ display: 'flex', gap: '12px', fontSize: '13px', color: '#94a3b8', fontWeight: '500' }}>
-                <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Calendar size={14} /> {new Date(selectedPhoto.activityDate).toLocaleDateString('fr-FR')}</span>
+                <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Calendar size={14} /> {new Date(selectedPhoto.activityDate).toLocaleDateString(isRTL ? 'ar-EG' : 'fr-FR')}</span>
                 <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><MapPin size={14} /> {selectedPhoto.className}</span>
               </div>
             </div>

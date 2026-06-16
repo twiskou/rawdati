@@ -3,6 +3,7 @@
 import { useState, useTransition, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { Plus, Trash2, Edit2, Calendar, Image as ImageIcon, X, AlertTriangle, MapPin, Upload } from 'lucide-react'
+import { useLanguage } from '@/lib/i18n/LanguageContext'
 
 interface Activity {
   id: string
@@ -38,6 +39,8 @@ export default function TeacherActivitiesClient({ activities: initial, classroom
 
   const [isPending, startTransition] = useTransition()
   const [msg, setMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
+  const { t, isRTL } = useLanguage()
+  const tr = t.teacher.activities
   
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
@@ -55,6 +58,7 @@ export default function TeacherActivitiesClient({ activities: initial, classroom
     outline: 'none',
     boxSizing: 'border-box',
     fontFamily: 'inherit',
+    textAlign: isRTL ? 'right' : 'left',
   }
 
   function showMessage(type: 'success' | 'error', text: string) {
@@ -84,7 +88,7 @@ export default function TeacherActivitiesClient({ activities: initial, classroom
 
       if (res.ok) {
         const data = await res.json()
-        showMessage('success', editId ? 'Activité modifiée avec succès !' : 'Activité publiée avec succès !')
+        showMessage('success', editId ? tr.successAdd : tr.successAdd)
         
         if (editId) {
           setActivities(prev => prev.map(a => a.id === editId ? { ...a, title, description, activityDate } : a))
@@ -98,7 +102,7 @@ export default function TeacherActivitiesClient({ activities: initial, classroom
         setDescription('')
         setEditId(null)
       } else {
-        showMessage('error', editId ? 'Erreur lors de la modification' : 'Erreur lors de la publication')
+        showMessage('error', editId ? tr.errorAdd : tr.errorAdd)
       }
     })
   }
@@ -109,9 +113,9 @@ export default function TeacherActivitiesClient({ activities: initial, classroom
       const res = await fetch(`/api/teacher/activities?id=${deleteId}`, { method: 'DELETE' })
       if (res.ok) {
         setActivities(prev => prev.filter(a => a.id !== deleteId))
-        showMessage('success', 'Activité supprimée avec succès !')
+        showMessage('success', tr.successDelete)
       } else {
-        showMessage('error', 'Erreur lors de la suppression')
+        showMessage('error', tr.errorDelete)
       }
       setDeleteId(null)
     })
@@ -190,7 +194,7 @@ export default function TeacherActivitiesClient({ activities: initial, classroom
           onMouseOut={(e) => e.currentTarget.style.transform = 'translateY(0)'}
         >
           <Plus size={18} />
-          Nouvelle activité
+          {tr.addActivity}
         </button>
       </div>
 
@@ -229,7 +233,7 @@ export default function TeacherActivitiesClient({ activities: initial, classroom
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
               <h2 style={{ margin: 0, fontSize: '20px', fontWeight: '800', color: '#0f172a' }}>
-                {editId ? 'Modifier l\'activité' : 'Nouvelle activité'}
+                {tr.addActivity}
               </h2>
               <button
                 onClick={() => setShowForm(false)}
@@ -259,8 +263,8 @@ export default function TeacherActivitiesClient({ activities: initial, classroom
               )}
 
               <div>
-                <label style={{ display: 'block', fontSize: '13px', fontWeight: '700', color: '#374151', marginBottom: '8px' }}>
-                  Titre *
+                <label style={{ display: 'block', fontSize: '13px', fontWeight: '700', color: '#374151', marginBottom: '8px', textAlign: isRTL ? 'right' : 'left' }}>
+                  {tr.form.title}
                 </label>
                 <input
                   type="text"
@@ -272,8 +276,8 @@ export default function TeacherActivitiesClient({ activities: initial, classroom
                 />
               </div>
               <div>
-                <label style={{ display: 'block', fontSize: '13px', fontWeight: '700', color: '#374151', marginBottom: '8px' }}>
-                  Description
+                <label style={{ display: 'block', fontSize: '13px', fontWeight: '700', color: '#374151', marginBottom: '8px', textAlign: isRTL ? 'right' : 'left' }}>
+                  {tr.form.description}
                 </label>
                 <textarea
                   value={description}
@@ -284,8 +288,8 @@ export default function TeacherActivitiesClient({ activities: initial, classroom
                 />
               </div>
               <div>
-                <label style={{ display: 'block', fontSize: '13px', fontWeight: '700', color: '#374151', marginBottom: '8px' }}>
-                  Date *
+                <label style={{ display: 'block', fontSize: '13px', fontWeight: '700', color: '#374151', marginBottom: '8px', textAlign: isRTL ? 'right' : 'left' }}>
+                  {tr.form.date}
                 </label>
                 <input
                   type="date"
@@ -305,7 +309,7 @@ export default function TeacherActivitiesClient({ activities: initial, classroom
                     background: 'white', fontSize: '14px', fontWeight: '600', cursor: 'pointer', color: '#374151',
                   }}
                 >
-                  Annuler
+                  {tr.form.cancel}
                 </button>
                 <button
                   type="submit"
@@ -317,7 +321,7 @@ export default function TeacherActivitiesClient({ activities: initial, classroom
                     fontSize: '14px', fontWeight: '700', cursor: isPending ? 'not-allowed' : 'pointer',
                   }}
                 >
-                  {isPending ? 'En cours...' : (editId ? 'Enregistrer' : 'Publier')}
+                  {isPending ? tr.form.publishing : tr.form.publish}
                 </button>
               </div>
             </form>
@@ -345,14 +349,13 @@ export default function TeacherActivitiesClient({ activities: initial, classroom
             <div style={{ width: '64px', height: '64px', borderRadius: '50%', background: '#fee2e2', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 24px' }}>
               <Trash2 size={28} color="#ef4444" />
             </div>
-            <h2 style={{ margin: '0 0 12px', fontSize: '20px', fontWeight: '800', color: '#0f172a' }}>Supprimer l'activité ?</h2>
-            <p style={{ margin: '0 0 32px', fontSize: '15px', color: '#64748b', lineHeight: '1.5' }}>Cette action est irréversible. Toutes les photos associées à cette activité seront également supprimées.</p>
-            <div style={{ display: 'flex', gap: '12px' }}>
+            <h2 style={{ margin: '0 0 12px', fontSize: '20px', fontWeight: '800', color: '#0f172a' }}>{tr.card.deleteConfirm}</h2>
+            <div style={{ display: 'flex', gap: '12px', marginTop: '32px' }}>
               <button onClick={() => setDeleteId(null)} style={{ flex: 1, padding: '14px', border: '1.5px solid #e2e8f0', borderRadius: '14px', background: 'white', fontSize: '14px', fontWeight: '600', cursor: 'pointer', color: '#374151' }}>
-                Annuler
+                {tr.form.cancel}
               </button>
               <button onClick={handleDelete} disabled={isPending} style={{ flex: 1, padding: '14px', background: isPending ? '#9ca3af' : '#ef4444', border: 'none', borderRadius: '14px', color: 'white', fontSize: '14px', fontWeight: '700', cursor: isPending ? 'not-allowed' : 'pointer' }}>
-                {isPending ? '...' : 'Oui, supprimer'}
+                {isPending ? '...' : tr.card.delete}
               </button>
             </div>
           </div>
@@ -371,10 +374,10 @@ export default function TeacherActivitiesClient({ activities: initial, classroom
             <span style={{ fontSize: '40px' }}>🎨</span>
           </div>
           <p style={{ fontSize: '20px', fontWeight: '800', color: '#0f172a', margin: '0 0 8px' }}>
-            Aucune activité publiée
+            {tr.noActivities}
           </p>
           <p style={{ color: '#64748b', margin: '0 0 24px', fontSize: '15px' }}>
-            Partagez les moments forts de vos classes avec les parents.
+            {tr.noActivitiesDesc}
           </p>
           <button
             onClick={() => setShowForm(true)}
@@ -384,7 +387,7 @@ export default function TeacherActivitiesClient({ activities: initial, classroom
               fontSize: '14px', fontWeight: '700', cursor: 'pointer',
             }}
           >
-            Créer une activité
+            {tr.addActivity}
           </button>
         </div>
       ) : (
@@ -422,13 +425,13 @@ export default function TeacherActivitiesClient({ activities: initial, classroom
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                     <Calendar size={14} color="#64748b" />
                     <span style={{ fontSize: '13px', color: '#475569', fontWeight: '500' }}>
-                      {new Date(activity.activityDate).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}
+                      {new Date(activity.activityDate).toLocaleDateString(isRTL ? 'ar-EG' : 'fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}
                     </span>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                     <ImageIcon size={14} color={activity.mediaCount > 0 ? '#4361EE' : '#64748b'} />
                     <span style={{ fontSize: '13px', color: activity.mediaCount > 0 ? '#4361EE' : '#475569', fontWeight: '600' }}>
-                      {activity.mediaCount} photo(s)
+                      {tr.card.photos.replace('{count}', activity.mediaCount.toString())}
                     </span>
                   </div>
                 </div>

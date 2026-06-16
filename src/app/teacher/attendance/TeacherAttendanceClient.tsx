@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { ChevronLeft, ChevronRight, Search, Eye, X } from 'lucide-react'
+import { useLanguage } from '@/lib/i18n/LanguageContext'
 
 interface Child {
   id: string
@@ -22,14 +23,18 @@ interface TeacherAttendanceClientProps {
   classrooms?: { id: string; name: string }[]
 }
 
-const statusConfig = {
-  PRESENT: { label: 'Présent', bg: '#d1fae5', color: '#059669', activeBg: '#10b981', activeColor: 'white' },
-  ABSENT: { label: 'Absent', bg: '#fee2e2', color: '#dc2626', activeBg: '#ef4444', activeColor: 'white' },
-  LATE: { label: 'Retard', bg: '#fef3c7', color: '#d97706', activeBg: '#f59e0b', activeColor: 'white' },
-}
+
 
 export default function TeacherAttendanceClient({ children, classroomId, todayStr, classrooms = [] }: TeacherAttendanceClientProps) {
   const router = useRouter()
+  const { t, isRTL } = useLanguage()
+  const tr = t.teacher.attendance
+
+  const statusConfig = {
+    PRESENT: { label: tr.status.present, bg: '#d1fae5', color: '#059669', activeBg: '#10b981', activeColor: 'white' },
+    ABSENT: { label: tr.status.absent, bg: '#fee2e2', color: '#dc2626', activeBg: '#ef4444', activeColor: 'white' },
+    LATE: { label: tr.status.late, bg: '#fef3c7', color: '#d97706', activeBg: '#f59e0b', activeColor: 'white' },
+  }
   const [attendances, setAttendances] = useState<Record<string, string>>(() => {
     const map: Record<string, string> = {}
     children.forEach((c) => {
@@ -89,7 +94,7 @@ export default function TeacherAttendanceClient({ children, classroomId, todaySt
   const lateCount = Object.values(attendances).filter((s) => s === 'LATE').length
   const unmarked = children.length - Object.keys(attendances).length
 
-  const dateDisplay = new Date(todayStr).toLocaleDateString('fr-FR', {
+  const dateDisplay = new Date(todayStr).toLocaleDateString(isRTL ? 'ar-EG' : 'fr-FR', {
     weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
   })
 
@@ -101,7 +106,7 @@ export default function TeacherAttendanceClient({ children, classroomId, todaySt
         {/* Class selector (only if multiple classrooms) */}
         {classrooms.length > 1 && (
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <span style={{ fontSize: '14px', fontWeight: '600', color: '#64748b' }}>Classe :</span>
+            <span style={{ fontSize: '14px', fontWeight: '600', color: '#64748b' }}>{isRTL ? 'القسم :' : 'Classe :'}</span>
             <select
               value={classroomId || ''}
               onChange={handleClassChange}
@@ -111,7 +116,7 @@ export default function TeacherAttendanceClient({ children, classroomId, todaySt
                 outline: 'none', cursor: 'pointer', fontFamily: 'inherit'
               }}
             >
-              <option value="all">Tous</option>
+              <option value="all">{isRTL ? 'الكل' : 'Tous'}</option>
               {classrooms.map(c => (
                 <option key={c.id} value={c.id}>{c.name}</option>
               ))}
@@ -127,7 +132,7 @@ export default function TeacherAttendanceClient({ children, classroomId, todaySt
             onMouseOver={(e) => (e.currentTarget.style.background = '#f1f5f9')}
             onMouseOut={(e) => (e.currentTarget.style.background = 'transparent')}
           >
-            <ChevronLeft size={16} /> Précédent
+            <ChevronLeft size={16} /> {isRTL ? 'السابق' : 'Précédent'}
           </button>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 16px', borderRadius: '8px', background: '#f8fafc' }}>
@@ -142,7 +147,7 @@ export default function TeacherAttendanceClient({ children, classroomId, todaySt
             onMouseOver={(e) => (e.currentTarget.style.background = '#f1f5f9')}
             onMouseOut={(e) => (e.currentTarget.style.background = 'transparent')}
           >
-            Suivant <ChevronRight size={16} />
+            {isRTL ? 'التالي' : 'Suivant'} <ChevronRight size={16} />
           </button>
         </div>
       </div>
@@ -150,10 +155,10 @@ export default function TeacherAttendanceClient({ children, classroomId, todaySt
       {/* Summary */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '12px', marginBottom: '24px' }}>
         {[
-          { label: 'Présents', value: presentCount, color: '#10b981', bg: '#d1fae5' },
-          { label: 'Absents', value: absentCount, color: '#ef4444', bg: '#fee2e2' },
-          { label: 'Retards', value: lateCount, color: '#f59e0b', bg: '#fef3c7' },
-          { label: 'Non marqués', value: unmarked, color: '#94a3b8', bg: '#f1f5f9' },
+          { label: tr.present, value: presentCount, color: '#10b981', bg: '#d1fae5' },
+          { label: tr.absent, value: absentCount, color: '#ef4444', bg: '#fee2e2' },
+          { label: tr.late, value: lateCount, color: '#f59e0b', bg: '#fef3c7' },
+          { label: isRTL ? 'لم يسجل' : 'Non marqués', value: unmarked, color: '#94a3b8', bg: '#f1f5f9' },
         ].map((s) => (
           <div
             key={s.label}
@@ -179,10 +184,10 @@ export default function TeacherAttendanceClient({ children, classroomId, todaySt
         >
           <p style={{ fontSize: '64px', margin: '0 0 16px' }}>🚫</p>
           <p style={{ fontSize: '18px', fontWeight: '700', color: '#0f172a', margin: '0 0 8px' }}>
-            Aucune classe assignée
+            {isRTL ? 'لم يتم تعيين أي قسم' : 'Aucune classe assignée'}
           </p>
           <p style={{ fontSize: '14px', color: '#64748b', margin: 0 }}>
-            Vous n'êtes assigné(e) à aucune classe pour le moment. Veuillez contacter l'administration.
+            {isRTL ? 'أنت لست مسؤولة عن أي قسم حالياً. يرجى الاتصال بالإدارة.' : 'Vous n\'êtes assigné(e) à aucune classe pour le moment. Veuillez contacter l\'administration.'}
           </p>
         </div>
       ) : children.length === 0 ? (
@@ -193,13 +198,13 @@ export default function TeacherAttendanceClient({ children, classroomId, todaySt
           }}
         >
           <p style={{ fontSize: '64px', margin: '0 0 16px' }}>👶</p>
-          <p style={{ fontSize: '18px', fontWeight: '600', color: '#374151', margin: 0 }}>Aucun élève dans la classe</p>
+          <p style={{ fontSize: '18px', fontWeight: '600', color: '#374151', margin: 0 }}>{isRTL ? 'لا يوجد تلاميذ في القسم' : 'Aucun élève dans la classe'}</p>
         </div>
       ) : (
         <div style={{ background: 'white', borderRadius: '20px', padding: '24px', boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', gap: '12px' }}>
             <h2 style={{ margin: 0, fontSize: '17px', fontWeight: '700', color: '#0f172a' }}>
-              Élèves ({children.length})
+              {isRTL ? 'التلاميذ' : 'Élèves'} ({children.length})
             </h2>
             
             {/* Search Bar */}
@@ -207,17 +212,17 @@ export default function TeacherAttendanceClient({ children, classroomId, todaySt
               <Search size={16} color="#94a3b8" style={{ marginRight: '8px' }} />
               <input
                 type="text"
-                placeholder="Rechercher un élève..."
+                placeholder={isRTL ? 'البحث عن تلميذ...' : 'Rechercher un élève...'}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                style={{ border: 'none', background: 'transparent', outline: 'none', fontSize: '14px', color: '#1e293b', width: '100%', fontFamily: 'inherit' }}
+                style={{ border: 'none', background: 'transparent', outline: 'none', fontSize: '14px', color: '#1e293b', width: '100%', fontFamily: 'inherit', textAlign: isRTL ? 'right' : 'left' }}
               />
             </div>
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
             {filteredChildren.length === 0 ? (
-              <p style={{ color: '#94a3b8', fontSize: '14px', textAlign: 'center', margin: '20px 0' }}>Aucun élève trouvé.</p>
+              <p style={{ color: '#94a3b8', fontSize: '14px', textAlign: 'center', margin: '20px 0' }}>{tr.noStudents}</p>
             ) : filteredChildren.map((child) => {
               const currentStatus = attendances[child.id]
               const isSaving = saving === child.id
@@ -296,7 +301,7 @@ export default function TeacherAttendanceClient({ children, classroomId, todaySt
                   </div>
 
                   {isSaved && (
-                    <span style={{ fontSize: '12px', color: '#10b981', fontWeight: '600' }}>✅ Sauvegardé</span>
+                    <span style={{ fontSize: '12px', color: '#10b981', fontWeight: '600' }}>✅ {tr.successSave}</span>
                   )}
                 </div>
               )
@@ -341,24 +346,24 @@ export default function TeacherAttendanceClient({ children, classroomId, todaySt
             <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                 <div>
-                  <p style={{ margin: '0 0 4px', fontSize: '13px', color: '#64748b', fontWeight: '600', textTransform: 'uppercase' }}>Date de naissance</p>
+                  <p style={{ margin: '0 0 4px', fontSize: '13px', color: '#64748b', fontWeight: '600', textTransform: 'uppercase' }}>{isRTL ? 'تاريخ الميلاد' : 'Date de naissance'}</p>
                   <p style={{ margin: 0, fontSize: '15px', color: '#0f172a', fontWeight: '500' }}>
-                    {selectedChild.birthDate ? new Date(selectedChild.birthDate).toLocaleDateString('fr-FR') : 'Non renseignée'}
+                    {selectedChild.birthDate ? new Date(selectedChild.birthDate).toLocaleDateString(isRTL ? 'ar-EG' : 'fr-FR') : (isRTL ? 'غير متوفر' : 'Non renseignée')}
                   </p>
                 </div>
               </div>
               
               <div>
-                <p style={{ margin: '0 0 6px', fontSize: '13px', color: '#64748b', fontWeight: '600', textTransform: 'uppercase' }}>Allergies</p>
+                <p style={{ margin: '0 0 6px', fontSize: '13px', color: '#64748b', fontWeight: '600', textTransform: 'uppercase' }}>{isRTL ? 'الحساسية' : 'Allergies'}</p>
                 <div style={{ background: selectedChild.allergies ? '#fee2e2' : '#f1f5f9', padding: '12px', borderRadius: '12px', color: selectedChild.allergies ? '#dc2626' : '#64748b', fontSize: '14px', fontWeight: '500' }}>
-                  {selectedChild.allergies || 'Aucune allergie signalée'}
+                  {selectedChild.allergies || (isRTL ? 'لا يوجد حساسية' : 'Aucune allergie signalée')}
                 </div>
               </div>
               
               <div>
-                <p style={{ margin: '0 0 6px', fontSize: '13px', color: '#64748b', fontWeight: '600', textTransform: 'uppercase' }}>Notes médicales</p>
+                <p style={{ margin: '0 0 6px', fontSize: '13px', color: '#64748b', fontWeight: '600', textTransform: 'uppercase' }}>{isRTL ? 'ملاحظات طبية' : 'Notes médicales'}</p>
                 <div style={{ background: '#f8fafc', padding: '12px', borderRadius: '12px', color: '#374151', fontSize: '14px', lineHeight: '1.5' }}>
-                  {selectedChild.medicalNotes || 'Aucune note particulière'}
+                  {selectedChild.medicalNotes || (isRTL ? 'لا يوجد ملاحظات طبية' : 'Aucune note particulière')}
                 </div>
               </div>
             </div>
@@ -367,7 +372,7 @@ export default function TeacherAttendanceClient({ children, classroomId, todaySt
                 onClick={() => setSelectedChild(null)}
                 style={{ padding: '10px 24px', borderRadius: '12px', background: 'white', border: '1px solid #cbd5e1', cursor: 'pointer', fontSize: '14px', fontWeight: '600', color: '#374151' }}
               >
-                Fermer
+                {isRTL ? 'إغلاق' : 'Fermer'}
               </button>
             </div>
           </div>
