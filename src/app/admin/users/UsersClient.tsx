@@ -364,10 +364,10 @@ export default function UsersClient({ users: initial, classrooms }: UsersClientP
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '20px' }}>
               <div>
                 <h2 style={{ margin: '0 0 4px', fontSize: '20px', fontWeight: '800', color: '#0f172a' }}>
-                  {editId ? tr.editUserTitle : tr.newUserTitle}
+                  {editId ? tr.editUser : tr.newUser}
                 </h2>
                 <p style={{ margin: 0, fontSize: '13px', color: '#94a3b8' }}>
-                  {editId ? tr.editUserDesc : tr.newUserDesc}
+                  {editId ? tr.editDesc : tr.newDesc}
                 </p>
               </div>
               <button onClick={() => setShowForm(false)} style={{ background: '#f1f5f9', border: 'none', borderRadius: '10px', cursor: 'pointer', padding: '8px', display: 'flex' }}>
@@ -404,18 +404,18 @@ export default function UsersClient({ users: initial, classrooms }: UsersClientP
               </div>
 
               <div>
-                <label style={{ display: 'block', fontSize: '11px', fontWeight: '700', color: '#374151', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.05em', textAlign: isRTL ? 'right' : 'left' }}>{tr.emailLabel} {editId && <span style={{ fontWeight: '400', color: '#94a3b8', textTransform: 'none' }}>{tr.emailUneditable}</span>}</label>
+                <label style={{ display: 'block', fontSize: '11px', fontWeight: '700', color: '#374151', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.05em', textAlign: isRTL ? 'right' : 'left' }}>{tr.email} {editId && <span style={{ fontWeight: '400', color: '#94a3b8', textTransform: 'none' }}>{tr.emailUneditable}</span>}</label>
                 <input type="email" value={formEmail} onChange={e => setFormEmail(e.target.value)} required disabled={!!editId} placeholder="email@exemple.com" style={{ ...inputStyle, opacity: editId ? 0.6 : 1, textAlign: isRTL ? 'right' : 'left' }} />
               </div>
 
               <div>
-                <label style={{ display: 'block', fontSize: '11px', fontWeight: '700', color: '#374151', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.05em', textAlign: isRTL ? 'right' : 'left' }}>{tr.phoneLabel}</label>
+                <label style={{ display: 'block', fontSize: '11px', fontWeight: '700', color: '#374151', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.05em', textAlign: isRTL ? 'right' : 'left' }}>{tr.phone}</label>
                 <input type="tel" value={formPhone} onChange={e => setFormPhone(e.target.value)} placeholder="+213 XXX XXX XXX" style={{ ...inputStyle, textAlign: isRTL ? 'right' : 'left' }} />
               </div>
 
               {!editId && (
                 <div>
-                  <label style={{ display: 'block', fontSize: '11px', fontWeight: '700', color: '#374151', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.05em', textAlign: isRTL ? 'right' : 'left' }}>{tr.passwordLabel}</label>
+                  <label style={{ display: 'block', fontSize: '11px', fontWeight: '700', color: '#374151', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.05em', textAlign: isRTL ? 'right' : 'left' }}>{tr.password}</label>
                   <div style={{ position: 'relative' }}>
                     <input type={showPwd ? 'text' : 'password'} value={formPassword} onChange={e => setFormPassword(e.target.value)} required minLength={6} placeholder="••••••••" style={{ ...inputStyle, paddingRight: isRTL ? '14px' : '44px', paddingLeft: isRTL ? '44px' : '14px', textAlign: isRTL ? 'right' : 'left' }} />
                     <button type="button" onClick={() => setShowPwd(!showPwd)} style={{ position: 'absolute', [isRTL ? 'left' : 'right']: '12px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: '#94a3b8', display: 'flex' }}>
@@ -465,15 +465,15 @@ export default function UsersClient({ users: initial, classrooms }: UsersClientP
             <div style={{ width: '64px', height: '64px', borderRadius: '50%', background: '#fee2e2', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px' }}>
               <Trash2 size={28} color="#ef4444" />
             </div>
-            <h2 style={{ margin: '0 0 8px', fontSize: '20px', fontWeight: '800', color: '#0f172a' }}>{tr.deleteUserTitle}</h2>
+            <h2 style={{ margin: '0 0 8px', fontSize: '20px', fontWeight: '800', color: '#0f172a' }}>{tr.deleteTitle}</h2>
             <p style={{ margin: '0 0 6px', fontSize: '15px', color: '#374151', fontWeight: '600' }}>{deleteName}</p>
-            <p style={{ margin: '0 0 28px', fontSize: '13px', color: '#94a3b8' }}>{tr.deleteWarning}</p>
+            <p style={{ margin: '0 0 28px', fontSize: '13px', color: '#94a3b8' }}>{tr.deleteDesc}</p>
             <div style={{ display: 'flex', gap: '12px' }}>
               <button onClick={() => setDeleteId(null)} style={{ flex: 1, padding: '12px', border: '1.5px solid #e2e8f0', borderRadius: '12px', background: 'white', fontSize: '14px', fontWeight: '600', cursor: 'pointer', color: '#374151' }}>
                 {tr.cancel}
               </button>
               <button onClick={handleDelete} disabled={isPending} style={{ flex: 1, padding: '12px', background: isPending ? '#9ca3af' : '#ef4444', border: 'none', borderRadius: '12px', color: 'white', fontSize: '14px', fontWeight: '700', cursor: isPending ? 'not-allowed' : 'pointer' }}>
-                {isPending ? tr.deleting : tr.deleteConfirm}
+                {isPending ? tr.deleting : tr.deleteBtn}
               </button>
             </div>
           </div>
