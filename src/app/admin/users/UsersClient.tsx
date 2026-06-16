@@ -364,10 +364,10 @@ export default function UsersClient({ users: initial, classrooms }: UsersClientP
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '20px' }}>
               <div>
                 <h2 style={{ margin: '0 0 4px', fontSize: '20px', fontWeight: '800', color: '#0f172a' }}>
-                  {editId ? 'Modifier l\'utilisateur' : 'Nouveau compte'}
+                  {editId ? tr.editUserTitle : tr.newUserTitle}
                 </h2>
                 <p style={{ margin: 0, fontSize: '13px', color: '#94a3b8' }}>
-                  {editId ? 'Modifiez les informations' : 'Créez un compte pour votre crèche'}
+                  {editId ? tr.editUserDesc : tr.newUserDesc}
                 </p>
               </div>
               <button onClick={() => setShowForm(false)} style={{ background: '#f1f5f9', border: 'none', borderRadius: '10px', cursor: 'pointer', padding: '8px', display: 'flex' }}>
@@ -394,31 +394,31 @@ export default function UsersClient({ users: initial, classrooms }: UsersClientP
             <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
                 <div>
-                  <label style={{ display: 'block', fontSize: '11px', fontWeight: '700', color: '#374151', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Prénom *</label>
+                  <label style={{ display: 'block', fontSize: '11px', fontWeight: '700', color: '#374151', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.05em', textAlign: isRTL ? 'right' : 'left' }}>{tr.firstName}</label>
                   <input type="text" value={formFirst} onChange={e => setFormFirst(e.target.value)} required placeholder="Amina" style={inputStyle} />
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: '11px', fontWeight: '700', color: '#374151', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Nom *</label>
+                  <label style={{ display: 'block', fontSize: '11px', fontWeight: '700', color: '#374151', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.05em', textAlign: isRTL ? 'right' : 'left' }}>{tr.lastName}</label>
                   <input type="text" value={formLast} onChange={e => setFormLast(e.target.value)} required placeholder="Bensalem" style={inputStyle} />
                 </div>
               </div>
 
               <div>
-                <label style={{ display: 'block', fontSize: '11px', fontWeight: '700', color: '#374151', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Email * {editId && <span style={{ fontWeight: '400', color: '#94a3b8', textTransform: 'none' }}>(non modifiable)</span>}</label>
-                <input type="email" value={formEmail} onChange={e => setFormEmail(e.target.value)} required disabled={!!editId} placeholder="email@exemple.com" style={{ ...inputStyle, opacity: editId ? 0.6 : 1 }} />
+                <label style={{ display: 'block', fontSize: '11px', fontWeight: '700', color: '#374151', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.05em', textAlign: isRTL ? 'right' : 'left' }}>{tr.emailLabel} {editId && <span style={{ fontWeight: '400', color: '#94a3b8', textTransform: 'none' }}>{tr.emailUneditable}</span>}</label>
+                <input type="email" value={formEmail} onChange={e => setFormEmail(e.target.value)} required disabled={!!editId} placeholder="email@exemple.com" style={{ ...inputStyle, opacity: editId ? 0.6 : 1, textAlign: isRTL ? 'right' : 'left' }} />
               </div>
 
               <div>
-                <label style={{ display: 'block', fontSize: '11px', fontWeight: '700', color: '#374151', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Téléphone</label>
-                <input type="tel" value={formPhone} onChange={e => setFormPhone(e.target.value)} placeholder="+213 XXX XXX XXX" style={inputStyle} />
+                <label style={{ display: 'block', fontSize: '11px', fontWeight: '700', color: '#374151', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.05em', textAlign: isRTL ? 'right' : 'left' }}>{tr.phoneLabel}</label>
+                <input type="tel" value={formPhone} onChange={e => setFormPhone(e.target.value)} placeholder="+213 XXX XXX XXX" style={{ ...inputStyle, textAlign: isRTL ? 'right' : 'left' }} />
               </div>
 
               {!editId && (
                 <div>
-                  <label style={{ display: 'block', fontSize: '11px', fontWeight: '700', color: '#374151', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Mot de passe * (min. 6 caractères)</label>
+                  <label style={{ display: 'block', fontSize: '11px', fontWeight: '700', color: '#374151', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.05em', textAlign: isRTL ? 'right' : 'left' }}>{tr.passwordLabel}</label>
                   <div style={{ position: 'relative' }}>
-                    <input type={showPwd ? 'text' : 'password'} value={formPassword} onChange={e => setFormPassword(e.target.value)} required minLength={6} placeholder="••••••••" style={{ ...inputStyle, paddingRight: '44px' }} />
-                    <button type="button" onClick={() => setShowPwd(!showPwd)} style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: '#94a3b8', display: 'flex' }}>
+                    <input type={showPwd ? 'text' : 'password'} value={formPassword} onChange={e => setFormPassword(e.target.value)} required minLength={6} placeholder="••••••••" style={{ ...inputStyle, paddingRight: isRTL ? '14px' : '44px', paddingLeft: isRTL ? '44px' : '14px', textAlign: isRTL ? 'right' : 'left' }} />
+                    <button type="button" onClick={() => setShowPwd(!showPwd)} style={{ position: 'absolute', [isRTL ? 'left' : 'right']: '12px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: '#94a3b8', display: 'flex' }}>
                       {showPwd ? <EyeOff size={17} /> : <Eye size={17} />}
                     </button>
                   </div>
@@ -428,9 +428,9 @@ export default function UsersClient({ users: initial, classrooms }: UsersClientP
               {/* Teacher: assign classroom */}
               {formRole === 'TEACHER' && (
                 <div>
-                  <label style={{ display: 'block', fontSize: '11px', fontWeight: '700', color: '#374151', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Classe assignée</label>
-                  <select value={formClassroomId} onChange={e => setFormClassroomId(e.target.value)} style={{ ...inputStyle, cursor: 'pointer' }}>
-                    <option value="">— Aucune classe —</option>
+                  <label style={{ display: 'block', fontSize: '11px', fontWeight: '700', color: '#374151', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.05em', textAlign: isRTL ? 'right' : 'left' }}>{tr.assignedClass}</label>
+                  <select value={formClassroomId} onChange={e => setFormClassroomId(e.target.value)} style={{ ...inputStyle, cursor: 'pointer', textAlign: isRTL ? 'right' : 'left' }}>
+                    <option value="">{tr.noClass}</option>
                     {classrooms.map(c => (
                       <option key={c.id} value={c.id}>{c.name}</option>
                     ))}
@@ -440,19 +440,17 @@ export default function UsersClient({ users: initial, classrooms }: UsersClientP
 
               {/* Info box */}
               <div style={{ padding: '12px 14px', borderRadius: '10px', background: formRole === 'TEACHER' ? 'rgba(16,185,129,0.06)' : 'rgba(67,97,238,0.06)', border: `1px solid ${formRole === 'TEACHER' ? 'rgba(16,185,129,0.2)' : 'rgba(67,97,238,0.2)'}` }}>
-                <p style={{ margin: 0, fontSize: '12px', color: formRole === 'TEACHER' ? '#059669' : '#4361EE', fontWeight: '500', lineHeight: '1.5' }}>
-                  {formRole === 'TEACHER'
-                    ? '👩‍🏫 Ce compte permettra à l\'éducatrice de gérer sa classe, enregistrer les présences et publier des activités.'
-                    : '👨‍👩‍👧 Ce compte permettra au parent de suivre son enfant, voir les activités et les présences.'}
+                <p style={{ margin: 0, fontSize: '12px', color: formRole === 'TEACHER' ? '#059669' : '#4361EE', fontWeight: '500', lineHeight: '1.5', textAlign: isRTL ? 'right' : 'left' }}>
+                  {formRole === 'TEACHER' ? tr.teacherInfo : tr.parentInfo}
                 </p>
               </div>
 
               <div style={{ display: 'flex', gap: '10px', paddingTop: '4px' }}>
                 <button type="button" onClick={() => setShowForm(false)} style={{ flex: 1, padding: '12px', border: '1.5px solid #e2e8f0', borderRadius: '12px', background: 'white', fontSize: '14px', fontWeight: '600', cursor: 'pointer', color: '#374151' }}>
-                  Annuler
+                  {tr.cancel}
                 </button>
                 <button type="submit" disabled={isPending} style={{ flex: 2, padding: '12px', background: isPending ? '#9ca3af' : (formRole === 'TEACHER' ? 'linear-gradient(135deg, #10b981, #059669)' : 'linear-gradient(135deg, #F72585, #4361EE)'), border: 'none', borderRadius: '12px', color: 'white', fontSize: '14px', fontWeight: '700', cursor: isPending ? 'not-allowed' : 'pointer', boxShadow: isPending ? 'none' : '0 4px 14px rgba(0,0,0,0.2)' }}>
-                  {isPending ? 'Enregistrement...' : (editId ? '✅ Enregistrer' : `✨ Créer le compte ${ROLE_CFG[formRole].label}`)}
+                  {isPending ? tr.saving : (editId ? tr.save : tr.createBtn.replace('{role}', ROLE_CFG[formRole].label))}
                 </button>
               </div>
             </form>
@@ -467,15 +465,15 @@ export default function UsersClient({ users: initial, classrooms }: UsersClientP
             <div style={{ width: '64px', height: '64px', borderRadius: '50%', background: '#fee2e2', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px' }}>
               <Trash2 size={28} color="#ef4444" />
             </div>
-            <h2 style={{ margin: '0 0 8px', fontSize: '20px', fontWeight: '800', color: '#0f172a' }}>Supprimer l'utilisateur ?</h2>
+            <h2 style={{ margin: '0 0 8px', fontSize: '20px', fontWeight: '800', color: '#0f172a' }}>{tr.deleteUserTitle}</h2>
             <p style={{ margin: '0 0 6px', fontSize: '15px', color: '#374151', fontWeight: '600' }}>{deleteName}</p>
-            <p style={{ margin: '0 0 28px', fontSize: '13px', color: '#94a3b8' }}>Cette action est irréversible. Le compte sera définitivement supprimé.</p>
+            <p style={{ margin: '0 0 28px', fontSize: '13px', color: '#94a3b8' }}>{tr.deleteWarning}</p>
             <div style={{ display: 'flex', gap: '12px' }}>
               <button onClick={() => setDeleteId(null)} style={{ flex: 1, padding: '12px', border: '1.5px solid #e2e8f0', borderRadius: '12px', background: 'white', fontSize: '14px', fontWeight: '600', cursor: 'pointer', color: '#374151' }}>
-                Annuler
+                {tr.cancel}
               </button>
               <button onClick={handleDelete} disabled={isPending} style={{ flex: 1, padding: '12px', background: isPending ? '#9ca3af' : '#ef4444', border: 'none', borderRadius: '12px', color: 'white', fontSize: '14px', fontWeight: '700', cursor: isPending ? 'not-allowed' : 'pointer' }}>
-                {isPending ? '...' : '🗑️ Supprimer'}
+                {isPending ? tr.deleting : tr.deleteConfirm}
               </button>
             </div>
           </div>
