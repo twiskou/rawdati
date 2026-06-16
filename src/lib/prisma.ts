@@ -5,13 +5,14 @@ import { createClient } from "@libsql/client";
 const globalForPrisma = global as unknown as { prisma: PrismaClient };
 
 function createPrismaClient() {
-  if (!process.env.DATABASE_URL && process.env.TURSO_DATABASE_URL) {
-    process.env.DATABASE_URL = process.env.TURSO_DATABASE_URL;
-  }
+  const envUrlKey = 'TURSO_DATABASE_URL';
+  const envTokenKey = 'TURSO_AUTH_TOKEN';
+  const dbUrl = process.env[envUrlKey];
+  const dbToken = process.env[envTokenKey];
 
   const libsql = createClient({
-    url: process.env.TURSO_DATABASE_URL!,
-    authToken: process.env.TURSO_AUTH_TOKEN!,
+    url: dbUrl!,
+    authToken: dbToken!,
   });
   const adapter = new PrismaLibSql(libsql);
   return new PrismaClient({ adapter });
